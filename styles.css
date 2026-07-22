@@ -112,6 +112,15 @@ section.block { padding: 84px 0; }
 .mission h2 { color: var(--on-navy); font-size: clamp(28px, 4.4vw, 44px); line-height: 1.12; margin: 0 auto 22px; max-width: 18ch; }
 .mission p { color: var(--on-navy-soft); font-size: 18px; max-width: 60ch; margin: 0 auto; }
 
+.price-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 40px 34px; max-width: 440px; margin: 34px auto 0; text-align: center; }
+.price { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.price .amt { font-family: var(--serif); font-size: 62px; line-height: 1; color: var(--heading); }
+.price .per { font-size: 16px; color: var(--ink-soft); font-weight: 600; }
+.price-feats { list-style: none; padding: 0; margin: 26px 0 28px; display: grid; gap: 12px; text-align: left; }
+.price-feats li { position: relative; padding-left: 28px; color: var(--ink); font-size: 15px; }
+.price-feats li::before { content: ""; position: absolute; left: 0; top: 7px; width: 14px; height: 8px; border-left: 2px solid var(--blue); border-bottom: 2px solid var(--blue); transform: rotate(-45deg); }
+.price-note { font-size: 13px; color: var(--ink-soft); margin: 16px 0 0; }
+
 .demo { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: start; }
 @media (max-width: 820px) { .demo { grid-template-columns: 1fr; gap: 34px; } }
 .hipaa { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-soft); margin-top: 18px; font-weight: 600; }
