@@ -10,7 +10,7 @@
 //   RESEND_API_KEY   (secret)  re_...   — the sending domain in LEAD_FROM must
 //                                         be verified in Resend first
 //   LEAD_FROM                  default "CosmaNeura <leads@cosmaneura.com>"
-//   LEAD_TO                    default "john@cosmaneura.com"
+//   LEAD_TO                    default "info@cosmaneura.com"
 //   LEAD_WEBHOOK_URL (secret)  https://hooks.zapier.com/...
 
 export async function onRequestPost({ request, env }) {
@@ -44,7 +44,7 @@ export async function onRequestPost({ request, env }) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(lead.email))
     return reply(request, 422, "Please provide a valid email address.");
 
-  const to = env.LEAD_TO || "john@cosmaneura.com";
+  const to = env.LEAD_TO || "info@cosmaneura.com";
   const from = env.LEAD_FROM || "CosmaNeura <leads@cosmaneura.com>";
   const subject =
     `Demo request — ${lead.first_name} ${lead.last_name}` + (lead.ehr ? ` (${lead.ehr})` : "");
@@ -61,7 +61,7 @@ export async function onRequestPost({ request, env }) {
 
   if (!env.RESEND_API_KEY && !env.LEAD_WEBHOOK_URL) {
     console.error("book-demo: no delivery path configured (RESEND_API_KEY / LEAD_WEBHOOK_URL).");
-    return reply(request, 503, "Demo booking isn't configured yet. Please email john@cosmaneura.com.");
+    return reply(request, 503, "Demo booking isn't configured yet. Please email info@cosmaneura.com.");
   }
 
   let delivered = false;
@@ -90,7 +90,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   if (!delivered)
-    return reply(request, 502, "Could not send your request. Please email john@cosmaneura.com.");
+    return reply(request, 502, "Could not send your request. Please email info@cosmaneura.com.");
 
   return reply(request, 200, "ok");
 }
