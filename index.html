@@ -161,17 +161,23 @@
           HIPAA compliant
         </span>
       </div>
-      <form class="card reveal" onsubmit="return false">
+      <form class="card reveal" id="demo-form" method="post" action="/api/book-demo">
         <div class="frow">
-          <div><label for="fn">First name</label><input id="fn" type="text" placeholder="Jane" required></div>
-          <div><label for="ln">Last name</label><input id="ln" type="text" placeholder="Doe" required></div>
+          <div><label for="fn">First name</label><input id="fn" name="first_name" type="text" placeholder="Jane" autocomplete="given-name" required></div>
+          <div><label for="ln">Last name</label><input id="ln" name="last_name" type="text" placeholder="Doe" autocomplete="family-name" required></div>
         </div>
-        <div><label for="em">Email</label><input id="em" type="email" placeholder="jane@practice.com" required></div>
+        <div><label for="em">Email</label><input id="em" name="email" type="email" placeholder="jane@practice.com" autocomplete="email" required></div>
         <div><label for="ehr">EHR platform</label>
-          <select id="ehr"><option>Select your EHR…</option><option>Epic</option><option>Athenahealth</option><option>eClinicalWorks</option><option>Practice Fusion</option><option>Other</option></select>
+          <select id="ehr" name="ehr"><option value="">Select your EHR…</option><option>Epic</option><option>Athenahealth</option><option>eClinicalWorks</option><option>Practice Fusion</option><option>Other</option></select>
         </div>
-        <div><label for="msg">Message</label><textarea id="msg" placeholder="Tell us about your practice…"></textarea></div>
-        <button class="btn btn-primary" type="submit" style="justify-content:center;">Book the demo</button>
+        <div><label for="msg">Message</label><textarea id="msg" name="message" placeholder="Tell us about your practice…"></textarea></div>
+        <!-- Honeypot: invisible to people, filled by bots. Server ignores submissions that fill it. -->
+        <div style="position:absolute; left:-9999px;" aria-hidden="true">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="btn btn-primary" id="demo-submit" type="submit" style="justify-content:center;">Book the demo</button>
+        <p id="demo-status" role="status" style="margin:0; font-size:13.5px; color:var(--ink-soft);"></p>
       </form>
     </div>
   </section>
@@ -192,9 +198,9 @@
         <div class="foot-meta" style="margin-top:8px;">New Hampshire, USA · © CosmaNeura 2020</div>
       </div>
       <div class="foot-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Support</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="mailto:john@cosmaneura.com">Support</a>
       </div>
     </div>
   </footer>
@@ -212,6 +218,37 @@
         });
       }, { threshold: 0.12 });
       els.forEach(function (e) { io.observe(e); });
+    })();
+
+    // Demo form: submit in place via fetch; without JS the form falls back to
+    // a native POST that redirects to /thanks.html.
+    (function () {
+      var form = document.getElementById('demo-form');
+      if (!form || !window.fetch) return;
+      var btn = document.getElementById('demo-submit');
+      var status = document.getElementById('demo-status');
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        btn.disabled = true; btn.textContent = 'Sending…';
+        status.textContent = ''; status.style.color = 'var(--ink-soft)';
+        fetch(form.action, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new URLSearchParams(new FormData(form))
+        }).then(function (res) {
+          return res.json().catch(function () { return { ok: res.ok }; }).then(function (data) {
+            if (!res.ok || !data.ok) throw new Error(data.message || ('HTTP ' + res.status));
+            form.innerHTML =
+              '<h3 style="font-family:var(--sans); font-size:19px; font-weight:700; margin:6px 0; color:var(--heading);">Request received ✓</h3>' +
+              '<p style="margin:0; color:var(--ink-soft);">Thank you — we’ll reach out within one business day to schedule your 30-minute demo.</p>';
+          });
+        }).catch(function () {
+          btn.disabled = false; btn.textContent = 'Book the demo';
+          status.innerHTML = 'Something went wrong sending your request. Please email us at ' +
+            '<a href="mailto:john@cosmaneura.com?subject=Demo%20request" style="color:var(--blue);">john@cosmaneura.com</a>.';
+          status.style.color = 'var(--coral)';
+        });
+      });
     })();
   </script>
 </body>
