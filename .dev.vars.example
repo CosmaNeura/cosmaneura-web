@@ -4,3 +4,9 @@
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_PRICE_ID=price_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Public assistant presentation configuration. This is not authorization or
+# entitlement; the configured Sovereign must be the separately deployed,
+# capability-limited public mount and must allow this website origin via CORS.
+PUBLIC_SOVEREIGN_PANEL_ENABLED=false
+PUBLIC_SOVEREIGN_ORIGIN=https://public-sovereign.example.com

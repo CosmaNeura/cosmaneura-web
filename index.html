@@ -7,6 +7,7 @@
   <meta name="description" content="AI clinical tools built for how Catholic physicians practice — smart summarization, diagnosis and billing suggestions, and intelligent transcription that work with your vocation, not against it.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <script type="module" src="/public-panel-gate.js"></script>
 </head>
 <body>
 
@@ -299,7 +300,23 @@
             if (!res.ok || !data.ok) throw new Error(data.message || ('HTTP ' + res.status));
             form.innerHTML =
               '<h3 style="font-family:var(--sans); font-size:19px; font-weight:700; margin:6px 0; color:var(--heading);">Request received ✓</h3>' +
-              '<p style="margin:0; color:var(--ink-soft);">Thank you — we’ll reach out within one business day to schedule your 30-minute demo.</p>';
+              '<p style="margin:0; color:var(--ink-soft);">Thank you — we’ll reach out within one business day to schedule your 30-minute demo.</p>' +
+              '<p id="public-assistant-status" role="status" style="margin:8px 0 0; color:var(--ink-soft);">Opening the free assistant…</p>';
+
+            // The lead form is only a presentation/reveal gate. It is
+            // intentionally bypassable and does not establish identity,
+            // authorization, subscription, or entitlement. No form value is
+            // passed to the assistant.
+            var assistantStatus = document.getElementById('public-assistant-status');
+            if (!window.CosmaNeuraPublicPanel) {
+              assistantStatus.textContent = 'The free assistant is unavailable right now.';
+              return;
+            }
+            window.CosmaNeuraPublicPanel.unlock().then(function (mounted) {
+              assistantStatus.textContent = mounted
+                ? 'The free assistant is now open.'
+                : 'The free assistant is unavailable right now.';
+            });
           });
         }).catch(function () {
           btn.textContent = 'Book the demo';
