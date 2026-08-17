@@ -4,3 +4,20 @@
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_PRICE_ID=price_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Demo lead protection and delivery. Both Turnstile values are required; then
+# configure Resend, an HTTPS webhook, or both. Never place real secrets here.
+TURNSTILE_SITE_KEY=replace_with_site_key
+TURNSTILE_SECRET_KEY=replace_with_secret_key
+# RESEND_API_KEY=re_xxx
+# LEAD_FROM=CosmaNeura <leads@cosmaneura.com>
+# LEAD_TO=info@cosmaneura.com
+# LEAD_WEBHOOK_URL=https://hooks.example.com/cosmaneura-demo
+
+# Public assistant presentation configuration. This is not authorization or
+# entitlement; the configured Sovereign must be the separately deployed,
+# capability-limited public mount and must allow this website origin for API
+# calls via an exact CORS allowlist. Panel JavaScript is vendored same-origin.
+# Leave unset to keep the panel off. Set only to the public deployment's bare
+# HTTPS origin (no path, query, credentials, or fragment).
+# PUBLIC_SOVEREIGN_ORIGIN=https://public-sovereign.example.com

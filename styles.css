@@ -134,6 +134,9 @@ input, textarea, select {
 }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
 textarea { resize: vertical; min-height: 84px; }
+.form-notice { margin: 7px 0 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.45; }
+.form-notice strong { color: var(--heading); }
+.form-notice a { color: var(--blue); }
 
 footer { border-top: 1px solid var(--line); padding: 44px 0; }
 .foot-in { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }

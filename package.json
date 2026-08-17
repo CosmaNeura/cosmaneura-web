@@ -1,0 +1,9 @@
+{
+  "name": "cosmaneura-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check public-panel-asset.js && node --check public-panel-gate.js && node --check functions/api/public-panel-config.js && node --check functions/api/book-demo.js && node --check functions/api/checkout.js && node --check functions/api/webhook.js && node --check tests/book-demo.test.js && node --check tests/public-panel-gate.test.js && node --check tests/site.test.js"
+  }
+}

@@ -7,6 +7,7 @@
   <meta name="description" content="AI clinical tools built for how Catholic physicians practice — smart summarization, diagnosis and billing suggestions, and intelligent transcription that work with your vocation, not against it.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <script type="module" src="/public-panel-gate.js"></script>
 </head>
 <body>
 
@@ -141,7 +142,7 @@
           <li>Full access to the CosmaNeura app</li>
           <li>Smart summarization, billing suggestions &amp; transcription</li>
           <li>English, Spanish &amp; Mandarin</li>
-          <li>HIPAA compliant</li>
+          <li>PHI workflows only under an executed BAA</li>
         </ul>
         <a href="/api/checkout" class="btn btn-primary" style="justify-content:center; width:100%;">Subscribe</a>
         <p class="price-note">Cancel anytime. New features included as we ship them.</p>
@@ -158,20 +159,33 @@
         <p style="color:var(--ink-soft);">We'll show you exactly how CosmaNeura handles a real patient visit in your field — no slideware, just the product doing the work.</p>
         <span class="hipaa">
           <svg class="icn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-          HIPAA compliant
+          PHI is accepted only in the application under an executed BAA
         </span>
       </div>
-      <form class="card reveal" onsubmit="return false">
+      <form class="card reveal" id="demo-form" method="post" action="/api/book-demo">
         <div class="frow">
-          <div><label for="fn">First name</label><input id="fn" type="text" placeholder="Jane" required></div>
-          <div><label for="ln">Last name</label><input id="ln" type="text" placeholder="Doe" required></div>
+          <div><label for="fn">First name</label><input id="fn" name="first_name" type="text" placeholder="Jane" autocomplete="given-name" maxlength="80" required></div>
+          <div><label for="ln">Last name</label><input id="ln" name="last_name" type="text" placeholder="Doe" autocomplete="family-name" maxlength="80" required></div>
         </div>
-        <div><label for="em">Email</label><input id="em" type="email" placeholder="jane@practice.com" required></div>
+        <div><label for="em">Email</label><input id="em" name="email" type="email" placeholder="jane@practice.com" autocomplete="email" maxlength="200" required></div>
         <div><label for="ehr">EHR platform</label>
-          <select id="ehr"><option>Select your EHR…</option><option>Epic</option><option>Athenahealth</option><option>eClinicalWorks</option><option>Practice Fusion</option><option>Other</option></select>
+          <select id="ehr" name="ehr"><option value="">Select your EHR…</option><option>Epic</option><option>Athenahealth</option><option>eClinicalWorks</option><option>Practice Fusion</option><option>Other</option></select>
         </div>
-        <div><label for="msg">Message</label><textarea id="msg" placeholder="Tell us about your practice…"></textarea></div>
-        <button class="btn btn-primary" type="submit" style="justify-content:center;">Book the demo</button>
+        <div>
+          <label for="msg">Message</label>
+          <textarea id="msg" name="message" placeholder="Tell us about your practice…" maxlength="2000" aria-describedby="msg-help"></textarea>
+          <p class="form-notice" id="msg-help"><strong>Do not include patient information or PHI.</strong> Share only non-patient details about your practice and demo needs.</p>
+        </div>
+        <!-- Honeypot: invisible to people, filled by bots. Server ignores submissions that fill it. -->
+        <div style="position:absolute; left:-9999px;" aria-hidden="true">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div id="demo-turnstile"></div>
+        <p id="demo-abuse-status" role="status" style="margin:0; font-size:13.5px; color:var(--ink-soft);">Loading submission protection…</p>
+        <noscript><p class="form-notice">JavaScript is required for the anti-abuse check. You can also email <a href="mailto:info@cosmaneura.com?subject=Demo%20request">info@cosmaneura.com</a>.</p></noscript>
+        <button class="btn btn-primary" id="demo-submit" type="submit" style="justify-content:center;" disabled>Book the demo</button>
+        <p id="demo-status" role="status" style="margin:0; font-size:13.5px; color:var(--ink-soft);"></p>
       </form>
     </div>
   </section>
@@ -192,9 +206,7 @@
         <div class="foot-meta" style="margin-top:8px;">New Hampshire, USA · © CosmaNeura 2020</div>
       </div>
       <div class="foot-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Support</a>
+        <a href="mailto:info@cosmaneura.com">Support</a>
       </div>
     </div>
   </footer>
@@ -212,6 +224,111 @@
         });
       }, { threshold: 0.12 });
       els.forEach(function (e) { io.observe(e); });
+    })();
+
+    // Demo form: load Cloudflare Turnstile configuration from the same-origin
+    // function, then submit in place after a fresh anti-abuse token is issued.
+    (function () {
+      var form = document.getElementById('demo-form');
+      if (!form) return;
+      var btn = document.getElementById('demo-submit');
+      var status = document.getElementById('demo-status');
+      var abuseStatus = document.getElementById('demo-abuse-status');
+      var widgetId = null;
+
+      function unavailable() {
+        btn.disabled = true;
+        abuseStatus.innerHTML = 'Demo request protection is temporarily unavailable. Please email ' +
+          '<a href="mailto:info@cosmaneura.com?subject=Demo%20request" style="color:var(--blue);">info@cosmaneura.com</a>.';
+        abuseStatus.style.color = 'var(--coral)';
+      }
+
+      function resetChallenge() {
+        btn.disabled = true;
+        abuseStatus.textContent = 'Please complete the anti-abuse check.';
+        abuseStatus.style.color = 'var(--ink-soft)';
+        if (window.turnstile && widgetId !== null) window.turnstile.reset(widgetId);
+      }
+
+      function renderChallenge(config) {
+        if (!window.turnstile) { unavailable(); return; }
+        widgetId = window.turnstile.render('#demo-turnstile', {
+          sitekey: config.turnstile_site_key,
+          action: config.turnstile_action,
+          callback: function () {
+            btn.disabled = false;
+            abuseStatus.textContent = 'Submission protection complete.';
+            abuseStatus.style.color = 'var(--ink-soft)';
+          },
+          'expired-callback': resetChallenge,
+          'error-callback': function () { unavailable(); }
+        });
+      }
+
+      if (!window.fetch) { unavailable(); return; }
+      fetch('/api/book-demo', { headers: { 'Accept': 'application/json' } })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            if (!res.ok || !data.ok || !data.turnstile_site_key) throw new Error('unavailable');
+            return data;
+          });
+        })
+        .then(function (config) {
+          var script = document.createElement('script');
+          script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+          script.async = true;
+          script.defer = true;
+          script.onload = function () { renderChallenge(config); };
+          script.onerror = unavailable;
+          document.head.appendChild(script);
+        })
+        .catch(unavailable);
+
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        if (btn.disabled) return;
+        btn.disabled = true; btn.textContent = 'Sending…';
+        status.textContent = ''; status.style.color = 'var(--ink-soft)';
+        fetch(form.action, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new URLSearchParams(new FormData(form))
+        }).then(function (res) {
+          return res.json().catch(function () { return { ok: res.ok }; }).then(function (data) {
+            if (!res.ok || !data.ok) throw new Error(data.message || ('HTTP ' + res.status));
+            form.innerHTML =
+              '<h3 style="font-family:var(--sans); font-size:19px; font-weight:700; margin:6px 0; color:var(--heading);">Request received ✓</h3>' +
+              '<p style="margin:0; color:var(--ink-soft);">Thank you — we’ll reach out within one business day to schedule your 30-minute demo.</p>' +
+              '<p id="public-assistant-status" role="status" style="margin:8px 0 0; color:var(--ink-soft);">Opening the free assistant…</p>';
+
+            // The lead form is only a presentation/reveal gate. It is
+            // intentionally bypassable and does not establish identity,
+            // authorization, subscription, or entitlement. No form value is
+            // passed to the assistant.
+            var assistantStatus = document.getElementById('public-assistant-status');
+            if (!window.CosmaNeuraPublicPanel ||
+                typeof window.CosmaNeuraPublicPanel.unlock !== 'function') {
+              assistantStatus.textContent = 'The free assistant is unavailable right now.';
+              return;
+            }
+            Promise.resolve().then(function () {
+              return window.CosmaNeuraPublicPanel.unlock();
+            }).then(function (mounted) {
+              assistantStatus.textContent = mounted
+                ? 'The free assistant is now open.'
+                : 'The free assistant is unavailable right now.';
+            }).catch(function () {
+              assistantStatus.textContent = 'The free assistant is unavailable right now.';
+            });
+          });
+        }).catch(function () {
+          btn.textContent = 'Book the demo';
+          status.innerHTML = 'Something went wrong sending your request. Please email us at ' +
+            '<a href="mailto:info@cosmaneura.com?subject=Demo%20request" style="color:var(--blue);">info@cosmaneura.com</a>.';
+          status.style.color = 'var(--coral)';
+          resetChallenge();
+        });
+      });
     })();
   </script>
 </body>
