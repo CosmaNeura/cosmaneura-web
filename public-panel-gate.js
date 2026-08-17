@@ -1,5 +1,9 @@
+import {
+  PUBLIC_PANEL_ASSET_PATH,
+  PUBLIC_PANEL_INTEGRITY,
+} from "./public-panel-asset.js";
+
 const CONFIG_ENDPOINT = "/api/public-panel-config";
-const PANEL_ASSET_PATH = "/embed/v1/panel.js";
 
 export function normalizeHttpsOrigin(value) {
   if (typeof value !== "string" || !value.trim()) return null;
@@ -77,7 +81,7 @@ export function createPublicPanelGate(options = {}) {
     return origin ? { sovereignOrigin: origin } : null;
   }
 
-  function loadVersionedPanelAsset(sovereignOrigin) {
+  function loadPinnedPanelAsset(sovereignOrigin) {
     if (loadedOrigin) {
       if (loadedOrigin !== sovereignOrigin) {
         return Promise.reject(new Error("The configured Sovereign origin changed"));
@@ -91,7 +95,7 @@ export function createPublicPanelGate(options = {}) {
     if (panelScriptPromise) return panelScriptPromise;
 
     // Refuse a pre-existing, unverified global. The gate only trusts the exact
-    // versioned asset it loaded from the configured HTTPS Sovereign origin.
+    // content-addressed Sovereign panel vendored on this same origin.
     if (windowObject.CosmaNeuraPanel) {
       return Promise.reject(new Error("An unverified panel is already present"));
     }
@@ -105,7 +109,8 @@ export function createPublicPanelGate(options = {}) {
         panelScriptPromise = null;
         reject(error);
       };
-      script.src = `${sovereignOrigin}${PANEL_ASSET_PATH}`;
+      script.src = PUBLIC_PANEL_ASSET_PATH;
+      script.integrity = PUBLIC_PANEL_INTEGRITY;
       script.async = true;
       script.crossOrigin = "anonymous";
       script.referrerPolicy = "no-referrer";
@@ -141,7 +146,7 @@ export function createPublicPanelGate(options = {}) {
       const config = await loadConfiguration();
       if (!config || generation !== lifecycle) return false;
 
-      const panelApi = await loadVersionedPanelAsset(config.sovereignOrigin);
+      const panelApi = await loadPinnedPanelAsset(config.sovereignOrigin);
       if (generation !== lifecycle) return false;
 
       const clientId = createEphemeralClientId(cryptoObject);

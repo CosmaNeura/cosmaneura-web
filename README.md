@@ -76,6 +76,27 @@ or PHI.
 The Privacy Policy and Terms in this repository are drafts pending counsel
 review; publishing the files does not constitute legal approval.
 
+## Public Sovereign panel
+
+The optional public panel unlocks only after a successful demo request. That is
+a presentation gate, not identity, authorization, subscription entitlement, or
+a capability grant. `PUBLIC_SOVEREIGN_ORIGIN` must be a bare HTTPS origin and is
+used only for the panel's API calls; the lead form's values are never passed to
+the panel.
+
+The panel code itself is an audited, content-addressed copy of
+`CosmaNeura/cosmaneura-sovereign`'s `app/panel.js` served from this website's
+`/vendor/` path with SRI. The source commit, SHA-256, SRI and path are pinned in
+`public-panel-asset.js` and checked by the dependency-free test suite. Do not
+replace it with a script loaded from `PUBLIC_SOVEREIGN_ORIGIN`: a cross-origin
+script executes in the marketing page's main realm and could read lead-form
+PII. Updating the asset requires reviewing a merged Sovereign commit, copying
+its exact bytes, and updating all four pins together.
+
+The separately deployed public Sovereign API must allow the marketing origin
+through its exact CORS allowlist. Leave `PUBLIC_SOVEREIGN_ORIGIN` unset until
+that deployment and CORS handoff are complete; the panel then remains off.
+
 ## Still pending (tracked)
 
 - [ ] **DNS cutover** — point `cosmaneura.com` at Cloudflare Pages, **preserving the

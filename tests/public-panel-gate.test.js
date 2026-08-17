@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import {
+  PUBLIC_PANEL_ASSET_PATH,
+  PUBLIC_PANEL_INTEGRITY,
+  PUBLIC_PANEL_SHA256,
+  PUBLIC_PANEL_UPSTREAM_COMMIT,
+} from "../public-panel-asset.js";
 import {
   createEphemeralClientId,
   createPublicPanelGate,
@@ -110,9 +117,27 @@ test("the page unlocks only inside the existing successful lead response branch"
     assert.doesNotMatch(gateSource, new RegExp(`\\b${leadField}\\b`));
   }
   assert.doesNotMatch(gateSource, /localStorage|sessionStorage|document\.cookie/);
+  assert.doesNotMatch(gateSource, /embed\/v1\/panel\.js/);
 });
 
-test("unlock loads only the versioned HTTPS asset and passes no lead PII or token", async () => {
+test("the vendored panel bytes match their content address, SRI, and merged provenance", () => {
+  const bytes = readFileSync(new URL(`..${PUBLIC_PANEL_ASSET_PATH}`, import.meta.url));
+  const digest = createHash("sha256").update(bytes).digest();
+
+  assert.equal(digest.toString("hex"), PUBLIC_PANEL_SHA256);
+  assert.equal(`sha256-${digest.toString("base64")}`, PUBLIC_PANEL_INTEGRITY);
+  assert.match(PUBLIC_PANEL_ASSET_PATH, new RegExp(PUBLIC_PANEL_SHA256));
+  assert.equal(
+    PUBLIC_PANEL_UPSTREAM_COMMIT,
+    "d8ae83112b0a3e5f1f84bf071c3cb8bb92abe3e0",
+  );
+  assert.match(
+    bytes.toString("utf8"),
+    /setRecord: function \(id\) \{ return loadThreadFor\(id\); \}/,
+  );
+});
+
+test("unlock loads only the same-origin pinned asset and passes no lead PII or token", async () => {
   const { calls, gate } = harness();
   assert.equal(await gate.unlock(), true);
 
@@ -125,7 +150,10 @@ test("unlock loads only the versioned HTTPS asset and passes no lead PII or toke
     cache: "no-store",
   });
   assert.equal(calls.scripts.length, 1);
-  assert.equal(calls.scripts[0].src, "https://public-sovereign.example/embed/v1/panel.js");
+  assert.equal(calls.scripts[0].src, PUBLIC_PANEL_ASSET_PATH);
+  assert.equal(calls.scripts[0].integrity, PUBLIC_PANEL_INTEGRITY);
+  assert.match(calls.scripts[0].src, /^\/vendor\/cosmaneura-panel\.v1\.[a-f0-9]{64}\.js$/);
+  assert.doesNotMatch(calls.scripts[0].src, /public-sovereign\.example/);
   assert.equal(calls.scripts[0].crossOrigin, "anonymous");
   assert.equal(calls.scripts[0].referrerPolicy, "no-referrer");
   assert.equal(calls.scripts[0].dataset.cosmaneuraSovereignPanel, "v1");
@@ -159,7 +187,7 @@ test("an unverified pre-existing panel global is never loaded or mounted", async
   assert.equal(calls.mounts.length, 0);
 });
 
-test("failed versioned assets are removed and can be retried cleanly", async () => {
+test("failed pinned assets are removed and can be retried cleanly", async () => {
   const behavior = { assetError: true };
   const { calls, gate } = harness(undefined, behavior);
 
