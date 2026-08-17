@@ -54,6 +54,28 @@ No Stripe SDK; the functions call Stripe's REST API directly.
 Phase 1 grants the app login **manually** (webhook logs the subscriber). Phase 2 will
 auto-provision the CosmaNeura app account from the webhook.
 
+## Demo-request form
+
+`POST /api/book-demo` is fail-closed until Cloudflare Turnstile and at least one
+lead-delivery path are configured. Add these Cloudflare Pages variables:
+
+- `TURNSTILE_SITE_KEY` — public site key for a Turnstile widget restricted to the
+  deployed marketing-site hostname.
+- `TURNSTILE_SECRET_KEY` — matching secret key; store it as a secret.
+- Either `RESEND_API_KEY` (plus a verified `LEAD_FROM` domain) or an HTTPS-only
+  `LEAD_WEBHOOK_URL`. `LEAD_TO` defaults to `info@cosmaneura.com`.
+
+The Function verifies a one-time Turnstile token before delivering a lead and
+rejects oversized bodies before parsing. It deliberately does **not** claim an
+in-process rate limit: Pages Functions instances are not durable shared storage.
+Configure a Cloudflare WAF rate-limiting rule for `POST /api/book-demo` (for
+example, five requests per minute per source IP, tuned from observed traffic) as
+an additional deployment control. The form must never be used for patient data
+or PHI.
+
+The Privacy Policy and Terms in this repository are drafts pending counsel
+review; publishing the files does not constitute legal approval.
+
 ## Still pending (tracked)
 
 - [ ] **DNS cutover** — point `cosmaneura.com` at Cloudflare Pages, **preserving the
