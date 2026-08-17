@@ -4,10 +4,12 @@ const PANEL_ASSET_PATH = "/embed/v1/panel.js";
 export function normalizeHttpsOrigin(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   try {
-    const parsed = new URL(value.trim());
+    const candidate = value.trim();
+    const parsed = new URL(candidate);
     if (parsed.protocol !== "https:") return null;
     if (parsed.username || parsed.password) return null;
     if (parsed.pathname !== "/" || parsed.search || parsed.hash) return null;
+    if (candidate !== parsed.origin && candidate !== `${parsed.origin}/`) return null;
     return parsed.origin;
   } catch {
     return null;
@@ -36,18 +38,35 @@ export function createPublicPanelGate(options = {}) {
   let activePanel = null;
   let lifecycle = 0;
   let loadedOrigin = null;
+  let loadedPanel = null;
+  let loadedPanelMount = null;
   let panelScriptPromise = null;
+  const destroyedPanels = new WeakSet();
+
+  function destroyPanel(panel) {
+    if (!panel || (typeof panel !== "object" && typeof panel !== "function")) return;
+    if (activePanel === panel) activePanel = null;
+    if (destroyedPanels.has(panel)) return;
+    destroyedPanels.add(panel);
+    try {
+      if (typeof panel.destroy === "function") panel.destroy();
+    } catch {
+      // The marketing site must remain usable even if a remote component's
+      // cleanup hook fails. Host state is detached before the hook runs.
+    }
+  }
 
   function destroyActivePanel() {
-    if (activePanel && typeof activePanel.destroy === "function") activePanel.destroy();
+    const panel = activePanel;
     activePanel = null;
+    destroyPanel(panel);
   }
 
   async function loadConfiguration() {
     const response = await fetchFunction(CONFIG_ENDPOINT, {
       method: "GET",
       headers: { Accept: "application/json" },
-      credentials: "same-origin",
+      credentials: "omit",
       cache: "no-store",
     });
     if (!response.ok) return null;
@@ -59,11 +78,15 @@ export function createPublicPanelGate(options = {}) {
   }
 
   function loadVersionedPanelAsset(sovereignOrigin) {
-    if (loadedOrigin === sovereignOrigin && windowObject.CosmaNeuraPanel) {
-      return Promise.resolve(windowObject.CosmaNeuraPanel);
-    }
-    if (loadedOrigin && loadedOrigin !== sovereignOrigin) {
-      return Promise.reject(new Error("The configured Sovereign origin changed"));
+    if (loadedOrigin) {
+      if (loadedOrigin !== sovereignOrigin) {
+        return Promise.reject(new Error("The configured Sovereign origin changed"));
+      }
+      if (windowObject.CosmaNeuraPanel !== loadedPanel ||
+          windowObject.CosmaNeuraPanel.mount !== loadedPanelMount) {
+        return Promise.reject(new Error("The verified Sovereign panel was replaced"));
+      }
+      return Promise.resolve(loadedPanel);
     }
     if (panelScriptPromise) return panelScriptPromise;
 
@@ -75,26 +98,33 @@ export function createPublicPanelGate(options = {}) {
 
     panelScriptPromise = new Promise((resolve, reject) => {
       const script = documentObject.createElement("script");
+      const rejectAndRemove = (error) => {
+        script.onload = null;
+        script.onerror = null;
+        script.remove();
+        panelScriptPromise = null;
+        reject(error);
+      };
       script.src = `${sovereignOrigin}${PANEL_ASSET_PATH}`;
       script.async = true;
       script.crossOrigin = "anonymous";
-      script.referrerPolicy = "strict-origin-when-cross-origin";
+      script.referrerPolicy = "no-referrer";
+      script.dataset.cosmaneuraSovereignPanel = "v1";
       script.onload = () => {
         const api = windowObject.CosmaNeuraPanel;
         if (!api || typeof api.mount !== "function") {
-          script.remove();
-          panelScriptPromise = null;
-          reject(new Error("The versioned panel asset did not expose its mount API"));
+          rejectAndRemove(new Error("The versioned panel asset did not expose its mount API"));
           return;
         }
         loadedOrigin = sovereignOrigin;
+        loadedPanel = api;
+        loadedPanelMount = api.mount;
+        script.onload = null;
+        script.onerror = null;
         resolve(api);
       };
-      script.onerror = () => {
-        script.remove();
-        panelScriptPromise = null;
-        reject(new Error("The versioned panel asset could not be loaded"));
-      };
+      script.onerror = () =>
+        rejectAndRemove(new Error("The versioned panel asset could not be loaded"));
       documentObject.head.appendChild(script);
     });
     return panelScriptPromise;
@@ -122,18 +152,18 @@ export function createPublicPanelGate(options = {}) {
       });
       if (!panel || typeof panel.destroy !== "function" ||
           typeof panel.setRecord !== "function") {
-        if (panel && typeof panel.destroy === "function") panel.destroy();
+        destroyPanel(panel);
         return false;
       }
       if (generation !== lifecycle) {
-        panel.destroy();
+        destroyPanel(panel);
         return false;
       }
 
       activePanel = panel;
       await panel.setRecord(clientId);
       if (generation !== lifecycle || activePanel !== panel) {
-        panel.destroy();
+        destroyPanel(panel);
         return false;
       }
       if (typeof panel.open === "function") panel.open();

@@ -308,14 +308,19 @@
             // authorization, subscription, or entitlement. No form value is
             // passed to the assistant.
             var assistantStatus = document.getElementById('public-assistant-status');
-            if (!window.CosmaNeuraPublicPanel) {
+            if (!window.CosmaNeuraPublicPanel ||
+                typeof window.CosmaNeuraPublicPanel.unlock !== 'function') {
               assistantStatus.textContent = 'The free assistant is unavailable right now.';
               return;
             }
-            window.CosmaNeuraPublicPanel.unlock().then(function (mounted) {
+            Promise.resolve().then(function () {
+              return window.CosmaNeuraPublicPanel.unlock();
+            }).then(function (mounted) {
               assistantStatus.textContent = mounted
                 ? 'The free assistant is now open.'
                 : 'The free assistant is unavailable right now.';
+            }).catch(function () {
+              assistantStatus.textContent = 'The free assistant is unavailable right now.';
             });
           });
         }).catch(function () {

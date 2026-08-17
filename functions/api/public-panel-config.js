@@ -1,10 +1,12 @@
 export function normalizeSovereignOrigin(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   try {
-    const parsed = new URL(value.trim());
+    const candidate = value.trim();
+    const parsed = new URL(candidate);
     if (parsed.protocol !== "https:") return null;
     if (parsed.username || parsed.password) return null;
     if (parsed.pathname !== "/" || parsed.search || parsed.hash) return null;
+    if (candidate !== parsed.origin && candidate !== `${parsed.origin}/`) return null;
     return parsed.origin;
   } catch {
     return null;
@@ -12,12 +14,12 @@ export function normalizeSovereignOrigin(value) {
 }
 
 export function onRequestGet({ env }) {
-  const explicitlyEnabled = String(env.PUBLIC_SOVEREIGN_PANEL_ENABLED || "").toLowerCase() === "true";
   const sovereignOrigin = normalizeSovereignOrigin(env.PUBLIC_SOVEREIGN_ORIGIN);
 
   // This endpoint is presentation configuration only. It grants no capability
   // and issues no token; the public Sovereign deployment remains the authority.
-  const body = explicitlyEnabled && sovereignOrigin
+  // A missing or invalid bare HTTPS origin is the default-off feature gate.
+  const body = sovereignOrigin
     ? { enabled: true, sovereign_origin: sovereignOrigin }
     : { enabled: false };
 
