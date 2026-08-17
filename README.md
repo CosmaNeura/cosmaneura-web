@@ -73,8 +73,8 @@ example, five requests per minute per source IP, tuned from observed traffic) as
 an additional deployment control. The form must never be used for patient data
 or PHI.
 
-The Privacy Policy and Terms in this repository are drafts pending counsel
-review; publishing the files does not constitute legal approval.
+Privacy and Terms pages are intentionally not shipped by this change. Publish
+only counsel-approved legal text in a separate review.
 
 ## Public Sovereign panel
 

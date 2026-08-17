@@ -3,8 +3,6 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
-const privacy = await readFile(new URL("../privacy.html", import.meta.url), "utf8");
-const terms = await readFile(new URL("../terms.html", import.meta.url), "utf8");
 
 test("the free-text field has an immediate, programmatically-associated no-PHI warning", () => {
   assert.match(
@@ -18,9 +16,8 @@ test("the marketing page does not make an unqualified HIPAA-compliance claim", (
   assert.match(index, /PHI is accepted only in the application under an executed BAA/);
 });
 
-test("both legal pages remain visibly labeled as drafts pending counsel review", () => {
-  for (const page of [privacy, terms])
-    assert.match(page, /<strong>Draft — pending counsel review\.<\/strong>/);
+test("the site does not link to unreviewed legal drafts", () => {
+  assert.doesNotMatch(index, /href="(?:privacy|terms)\.html"/);
 });
 
 test("the form is disabled until same-origin Turnstile configuration succeeds", () => {
