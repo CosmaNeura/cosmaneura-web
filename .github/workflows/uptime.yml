@@ -1,0 +1,19 @@
+name: Uptime
+
+# Fails (and so notifies watchers by email) when either public surface is
+# unreachable. Curl retries transient blips before declaring an outage.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: cosmaneura.com
+        run: curl -sSfL --max-time 20 --retry 2 --retry-delay 15 --retry-all-errors -o /dev/null https://cosmaneura.com
+      - name: app.cosmaneura.com
+        if: always()
+        run: curl -sSfL --max-time 20 --retry 2 --retry-delay 15 --retry-all-errors -o /dev/null https://app.cosmaneura.com
