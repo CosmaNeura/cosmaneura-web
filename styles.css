@@ -166,3 +166,14 @@ ol.rollout { counter-reset: step; }
 .legal .cn-baa blockquote { margin: 0.6em 0 0.6em 1.4em; }
 .legal .cn-baa table { width: 100%; border-collapse: collapse; margin: 0.8em 0; }
 .legal .cn-baa td { border: 1px solid var(--line); padding: 6px 10px; vertical-align: top; }
+
+/* Legal pages (privacy, terms) */
+.legal { padding: 64px 0 90px; }
+.legal h1 { font-size: clamp(30px, 4.5vw, 44px); margin: 0 0 6px; }
+.legal .updated { color: var(--ink-soft); font-size: 14px; margin: 0 0 38px; }
+.legal h2 { font-family: var(--sans); font-size: 19px; font-weight: 700; margin: 36px 0 10px; color: var(--heading); }
+.legal p, .legal li { color: var(--ink); font-size: 15.5px; }
+.legal ul { padding-left: 22px; margin: 10px 0; display: grid; gap: 6px; }
+.legal a { color: var(--blue); }
+.legal .callout { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+.legal .callout p { margin: 0; }
