@@ -21,8 +21,10 @@ Channel is attribution. Join still requires a matching practice work-email domai
 Cloudflare Pages, connected to this repo. **No build command.** Output = project root.
 Pretty paths are Cloudflare Pages HTML files (`catholic.html` → `/catholic`). Do not 200-rewrite those to `.html` — it 308-loops against Pages’ pretty URLs.
 
-Stripe `$89/mo` checkout remains `/api/checkout` (independent + Catholic pages).
-MCD has no public subscribe.
+The site no longer links Stripe checkout — every CTA (including pricing) goes to
+app sign-up, and billing happens in the app once the practice's BAA is in force.
+The `/api/checkout` + `/api/webhook` functions stay deployed for anyone mid-flow
+and are retired when in-app billing ships. MCD has no public subscribe.
 
 ## Local
 
