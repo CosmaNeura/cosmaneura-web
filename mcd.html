@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmas for MyCatholicDoctor</title>
+  <meta name="description" content="Invite-only rollout for the MyCatholicDoctor network. Sign in with your @mycatholicdoctor.com address. A personal inbox cannot join.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-in">
+      <a href="/" aria-label="Cosmas home">
+        <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </a>
+      <div class="nav-links">
+        <a href="#rollout">Rollout</a><a href="/catholic">Catholic practices</a><a href="/">Any independent clinic</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue with an MCD invite</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <p class="eyebrow">MyCatholicDoctor · provider rollout</p>
+    <h1>Cosmas for MyCatholicDoctor</h1>
+    <p class="lead">The documentation layer for the network. Invite-only this round. Sign in with your @mycatholicdoctor.com address — a personal inbox cannot join, and Cosmas sends that person to found their own practice instead.</p>
+    <div class="cta-row">
+      <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue with an MCD invite</a>
+      <a href="/catholic" class="btn btn-ghost">Catholic practices, not on MCD</a>
+    </div>
+  </header>
+  <section class="block" id="rollout">
+    <div class="wrap problem">
+      <div class="reveal">
+        <p class="eyebrow">How this rollout works</p>
+        <h2 class="lede-h">One network. One BAA per practice. Cosmas on every charting day.</h2>
+        <ol class="rollout">
+          <li>Sign in to Cosmas with your @mycatholicdoctor.com address — the one MCD has on file.</li>
+          <li>Join with the practice code from your lead, or found the practice if you are the lead. A Gmail is sent down the solo Cosmas path.</li>
+          <li>Attest under the Cosmaneura Inc BAA already accepted for that practice. You do not sign a second one.</li>
+          <li>Capture. Pastoral pack is on for MCD tenants. Parish pathways still need a physician tap.</li>
+        </ol>
+      </div>
+      <aside class="feat reveal">
+        <p class="eyebrow">Work email</p>
+        <h3>@mycatholicdoctor.com</h3>
+        <p>The join code is not enough. Cosmas will not attach a personal inbox to an MCD practice. Same Cosmas contract as every independent clinic. Cosmaneura Inc is the business associate. MCD remains the care network.</p>
+        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary" style="margin-top:18px;">Sign in and join</a>
+      </aside>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot-in">
+      <div>
+        <svg class="brand" width="140" height="30" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
+      </div>
+      <div class="foot-links">
+        <a href="/">Independent clinics</a>
+        <a href="/catholic">Catholic practices</a>
+        <a href="/mcd">MyCatholicDoctor</a>
+        <a href="/company">Cosmaneura Inc</a>
+        <a href="/baa">BAA</a>
+        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(function (e) { e.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (e) { io.observe(e); });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmas for Catholic practices</title>
+  <meta name="description" content="Built for how Catholic physicians practice. Same Cosmas. Same Cosmaneura Inc BAA. Pastoral pack is an entitlement, not a second product.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-in">
+      <a href="/" aria-label="Cosmas home">
+        <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </a>
+      <div class="nav-links">
+        <a href="#vocation">Vocation</a><a href="/">Any independent clinic</a><a href="/mcd">MyCatholicDoctor</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=catholic" class="btn btn-primary">Continue in Cosmas</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <p class="eyebrow">Catholic physicians · independent practice</p>
+    <h1>Built for how Catholic physicians practice.</h1>
+    <p class="lead">Faithful medicine should not be the harder path. Cosmas captures the visit, drafts the note, and queues the work after it — with conscience-care language and pastoral pathways as a pack, not a second product.</p>
+    <div class="cta-row">
+      <a href="https://app.cosmaneura.com/sign-up?channel=catholic" class="btn btn-primary">Continue in Cosmas</a>
+      <a href="/" class="btn btn-ghost">Cosmas for any independent clinic</a>
+    </div>
+  </header>
+  <section class="block" id="vocation">
+    <div class="wrap problem">
+      <div class="reveal">
+        <p class="eyebrow">Same product</p>
+        <h2 class="lede-h">Vocation is the copy. Cosmas is the app.</h2>
+        <p style="color:var(--ink-soft);">The Catholic vision of care is the heart of the practice, not an edge case. Pastoral pack is an entitlement you turn on. The BAA is still with Cosmaneura Inc and the practice.</p>
+      </div>
+      <div class="prob-list reveal">
+        <div class="prob-item"><h3>Conscience</h3><p>NFP and fertility language, whole-person notes, no charting against what you believe.</p></div>
+        <div class="prob-item"><h3>Pastoral pack</h3><p>Parish correspondence stays per-event. A physician still taps approve.</p></div>
+        <div class="prob-item"><h3>One BAA</h3><p>Owners accept once. Invited staff attest. Join requires the practice work-email domain.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="block" id="pricing">
+    <div class="wrap narrow" style="text-align:center;">
+      <div class="price-card reveal">
+        <div class="price"><span class="amt">$89</span><span class="per">/ clinician / month</span></div>
+        <a href="/api/checkout" class="btn btn-primary" style="justify-content:center; width:100%;">Subscribe</a>
+        <p class="price-note"><a href="https://app.cosmaneura.com/sign-up?channel=catholic">Or continue in Cosmas</a> with your practice work email.</p>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot-in">
+      <div>
+        <svg class="brand" width="140" height="30" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
+      </div>
+      <div class="foot-links">
+        <a href="/">Independent clinics</a>
+        <a href="/catholic">Catholic practices</a>
+        <a href="/mcd">MyCatholicDoctor</a>
+        <a href="/company">Cosmaneura Inc</a>
+        <a href="/baa">BAA</a>
+        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(function (e) { e.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (e) { io.observe(e); });
+    })();
+  </script>
+</body>
+</html>

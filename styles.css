@@ -151,3 +151,12 @@ footer { border-top: 1px solid var(--line); padding: 44px 0; }
   .draw { animation: none; stroke-dashoffset: 0; }
   html { scroll-behavior: auto; }
 }
+
+.hero-note { margin: 22px auto 0; max-width: 52ch; font-size: 14px; color: var(--ink-soft); }
+.hero-note a { font-weight: 600; }
+ol.rollout { margin: 28px 0 0; padding: 0; list-style: none; display: grid; gap: 18px; }
+ol.rollout li { padding-left: 36px; position: relative; color: var(--ink); font-size: 15.5px; }
+ol.rollout li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; font-family: var(--serif); color: var(--blue); font-size: 22px; line-height: 1; }
+ol.rollout { counter-reset: step; }
+.legal h2 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin: 28px 0 8px; }
+.legal p { color: var(--ink-soft); }
