@@ -160,3 +160,9 @@ ol.rollout li::before { counter-increment: step; content: counter(step); positio
 ol.rollout { counter-reset: step; }
 .legal h2 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin: 28px 0 8px; }
 .legal p { color: var(--ink-soft); }
+
+/* Canonical BAA legal text (verbatim, styled from outside only) */
+.legal .cn-baa p { margin: 0.6em 0; }
+.legal .cn-baa blockquote { margin: 0.6em 0 0.6em 1.4em; }
+.legal .cn-baa table { width: 100%; border-collapse: collapse; margin: 0.8em 0; }
+.legal .cn-baa td { border: 1px solid var(--line); padding: 6px 10px; vertical-align: top; }
