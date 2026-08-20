@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmaneura Inc — the company behind Cosmas</title>
+  <meta name="description" content="Cosmaneura Inc is a Delaware C-corporation. Cosmas is the product. The BAA is with the company, not the wordmark.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-in">
+      <a href="/" aria-label="Cosmas home">
+        <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </a>
+      <div class="nav-links">
+        <a href="/">Cosmas</a><a href="/baa">BAA</a><a href="mailto:info@cosmaneura.com">Contact</a>
+        <a href="https://app.cosmaneura.com/sign-up" class="btn btn-primary">Continue in Cosmas</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <p class="eyebrow">The company</p>
+    <h1>Cosmaneura Inc</h1>
+    <p class="lead">Delaware C-corporation, headquartered in New Hampshire. Cosmas is the product. The business associate on your BAA is Cosmaneura Inc — never the wordmark alone.</p>
+    <div class="cta-row">
+      <a href="/baa" class="btn btn-primary">Read the draft BAA</a>
+      <a href="mailto:info@cosmaneura.com" class="btn btn-ghost">info@cosmaneura.com</a>
+    </div>
+  </header>
+  <section class="block">
+    <div class="wrap features">
+      <div class="feat reveal"><h3>Product</h3><p>Cosmas — capture, notes, coding queue, intake. One app for independent clinics, Catholic practices, and the MCD rollout.</p></div>
+      <div class="feat reveal"><h3>Legal party</h3><p>Cosmaneura Inc signs the BAA with the practice. Workforce attests. There is not a second BAA per clinician.</p></div>
+      <div class="feat reveal"><h3>Not a second MyCatholicDoctor</h3><p>MCD remains the care network. Cosmas is the documentation layer those practices open after the invite.</p></div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot-in">
+      <div>
+        <svg class="brand" width="140" height="30" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
+      </div>
+      <div class="foot-links">
+        <a href="/">Independent clinics</a>
+        <a href="/catholic">Catholic practices</a>
+        <a href="/mcd">MyCatholicDoctor</a>
+        <a href="/company">Cosmaneura Inc</a>
+        <a href="/baa">BAA</a>
+        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(function (e) { e.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (e) { io.observe(e); });
+    })();
+  </script>
+</body>
+</html>

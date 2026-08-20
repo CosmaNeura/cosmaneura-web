@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmas Business Associate Agreement — Cosmaneura Inc</title>
+  <meta name="description" content="Draft BAA between Cosmaneura Inc and the practice. Counsel must ratify before this is the operative production agreement.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-in">
+      <a href="/" aria-label="Cosmas home">
+        <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </a>
+      <div class="nav-links">
+        <a href="/company">Company</a><a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="https://app.cosmaneura.com/sign-up" class="btn btn-primary">Continue in Cosmas</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <p class="eyebrow">Draft · UX onboarding</p>
+    <h1>Business Associate Agreement</h1>
+    <p class="lead">Covered entity: the practice you name in Cosmas. Business associate: Cosmaneura Inc. Product: Cosmas. This clickwrap text is a product-UX draft. Counsel must ratify before it is the operative legal instrument.</p>
+  </header>
+  <section class="block">
+    <div class="wrap narrow legal">
+      <h2>1. Parties</h2>
+      <p>This BAA is between Cosmaneura Inc, a Delaware corporation (“Business Associate”), and the practice named at acceptance (“Covered Entity”). Cosmas is the service operated by Cosmaneura Inc.</p>
+      <h2>2. One agreement for the practice</h2>
+      <p>This BAA is with the practice, not with each clinician. Workforce may use Cosmas under this BAA. Invited members attest; they do not execute a second BAA.</p>
+      <h2>3. Permitted uses</h2>
+      <p>Cosmaneura Inc may use and disclose PHI only to provide Cosmas (ambient capture, draft documentation, coding suggestions, intake, and related workflows), for proper management, legal duties, and data aggregation, each as permitted by 45 C.F.R. § 164.504(e). Cosmaneura Inc will not use PHI for marketing or sell PHI.</p>
+      <h2>4. Fail-closed</h2>
+      <p>Cosmaneura Inc will not process PHI through Cosmas until this BAA is accepted. Cosmas does not write autonomously to an EHR; a human remains the transmitting actor.</p>
+      <h2>5. Term</h2>
+      <p>Effective on acceptance in Cosmas. Questions: <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>.</p>
+      <p class="price-note">Joining a practice also requires a matching work-email domain (for MyCatholicDoctor: @mycatholicdoctor.com).</p>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot-in">
+      <div>
+        <svg class="brand" width="140" height="30" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
+          <text x="4" y="54" font-size="42" font-family="Futura,'Century Gothic','Avenir Next',sans-serif" font-weight="400">
+            <tspan class="c-cosma">COSMAS</tspan>
+          </text>
+          <g transform="translate(268,8)">
+            <path class="c-pulse" d="M0 40 H30 l5 6 l5 -6 H52 L60 14 L68 40 H84 l4 -6 l4 6 H120" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="c-cross" d="M50 24 H70" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
+      </div>
+      <div class="foot-links">
+        <a href="/">Independent clinics</a>
+        <a href="/catholic">Catholic practices</a>
+        <a href="/mcd">MyCatholicDoctor</a>
+        <a href="/company">Cosmaneura Inc</a>
+        <a href="/baa">BAA</a>
+        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(function (e) { e.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (e) { io.observe(e); });
+    })();
+  </script>
+</body>
+</html>
