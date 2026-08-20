@@ -1,8 +1,3 @@
-/catholic  /catholic.html  200
-/mcd       /mcd.html       200
-/company   /company.html   200
-/baa       /baa.html       200
-/catholic/ /catholic.html  200
-/mcd/      /mcd.html       200
-/company/  /company.html   200
-/baa/      /baa.html       200
+# Cloudflare Pages already serves catholic.html at /catholic (and 308s
+# /catholic.html → /catholic). A 200 rewrite the other way loops.
+# Keep this file for future non-HTML redirects only.

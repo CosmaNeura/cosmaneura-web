@@ -19,7 +19,7 @@ Channel is attribution. Join still requires a matching practice work-email domai
 ## Deploy
 
 Cloudflare Pages, connected to this repo. **No build command.** Output = project root.
-Pretty paths are in `_redirects`.
+Pretty paths are Cloudflare Pages HTML files (`catholic.html` → `/catholic`). Do not 200-rewrite those to `.html` — it 308-loops against Pages’ pretty URLs.
 
 Stripe `$89/mo` checkout remains `/api/checkout` (independent + Catholic pages).
 MCD has no public subscribe.
