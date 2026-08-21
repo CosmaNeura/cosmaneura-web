@@ -4,23 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cosmas for MyCatholicDoctor</title>
-  <meta name="description" content="Invite-only rollout for the MyCatholicDoctor network. Sign in with your @mycatholicdoctor.com address. A personal inbox cannot join.">
+  <meta name="description" content="Limited Cosmas rollout for MyCatholicDoctor work-email users. A personal inbox cannot join an MCD practice.">
   <link rel="canonical" href="https://cosmaneura.com/mcd">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cosmas — Cosmaneura Inc">
   <meta property="og:title" content="Cosmas for MyCatholicDoctor">
-  <meta property="og:description" content="Invite-only rollout for the MyCatholicDoctor network. Sign in with your @mycatholicdoctor.com address. A personal inbox cannot join.">
+  <meta property="og:description" content="Limited Cosmas rollout for MyCatholicDoctor work-email users. A personal inbox cannot join an MCD practice.">
   <meta property="og:url" content="https://cosmaneura.com/mcd">
   <meta property="og:image" content="https://cosmaneura.com/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <nav>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav aria-label="Primary">
     <div class="wrap nav-in">
       <a href="/" aria-label="Cosmas home">
         <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
@@ -35,16 +36,17 @@
       </a>
       <div class="nav-links">
         <a href="#rollout">Rollout</a><a href="/catholic">Catholic practices</a><a href="/">Any independent clinic</a>
-        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue with an MCD invite</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue in Cosmas</a>
       </div>
     </div>
   </nav>
+  <main id="main-content">
   <header class="hero wrap" id="top">
     <p class="eyebrow">MyCatholicDoctor · provider rollout</p>
     <h1>Cosmas for MyCatholicDoctor</h1>
-    <p class="lead">The documentation layer for the network. Invite-only this round. Sign in with your @mycatholicdoctor.com address — a personal inbox cannot join, and Cosmas sends that person to found their own practice instead.</p>
+    <p class="lead">A limited rollout for MCD work-email users. Sign in with your @mycatholicdoctor.com address — a personal inbox cannot join an MCD practice.</p>
     <div class="cta-row">
-      <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue with an MCD invite</a>
+      <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary">Continue with MCD email</a>
       <a href="/catholic" class="btn btn-ghost">Catholic practices, not on MCD</a>
     </div>
   </header>
@@ -53,21 +55,22 @@
       <div class="reveal">
         <p class="eyebrow">How this rollout works</p>
         <h2 class="lede-h">One network. One BAA per practice. Cosmas on every charting day.</h2>
-        <ol class="rollout">
-          <li>Sign in to Cosmas with your @mycatholicdoctor.com address — the one MCD has on file.</li>
+        <ol class="rollout" role="list">
+          <li>Sign in to Cosmas with your @mycatholicdoctor.com work address.</li>
           <li>Join with the practice code from your lead, or found the practice if you are the lead. A Gmail is sent down the solo Cosmas path.</li>
           <li>Attest under the Cosmaneura Inc BAA already accepted for that practice. You do not sign a second one.</li>
-          <li>Capture. Pastoral pack is on for MCD tenants. Parish pathways still need a physician tap.</li>
+          <li>Capture and draft notes in the same clinician-controlled Cosmas workflow.</li>
         </ol>
       </div>
       <aside class="feat reveal">
         <p class="eyebrow">Work email</p>
         <h3>@mycatholicdoctor.com</h3>
         <p>The join code is not enough. Cosmas will not attach a personal inbox to an MCD practice. Same Cosmas contract as every independent clinic. Cosmaneura Inc is the business associate. MCD remains the care network.</p>
-        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary" style="margin-top:18px;">Sign in and join</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=mcd" class="btn btn-primary" style="margin-top:18px;">Continue with MCD email</a>
       </aside>
     </div>
   </section>
+  </main>
   <footer>
     <div class="wrap foot-in">
       <div>
@@ -82,7 +85,7 @@
         </svg>
         <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
       </div>
-      <div class="foot-links">
+      <nav class="foot-links" aria-label="Footer">
         <a href="/">Independent clinics</a>
         <a href="/catholic">Catholic practices</a>
         <a href="/mcd">MyCatholicDoctor</a>
@@ -90,9 +93,9 @@
         <a href="/baa">BAA</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="https://app.cosmaneura.com/sign-in?channel=mcd">Sign in</a>
         <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
-      </div>
+      </nav>
     </div>
   </footer>
   <script>

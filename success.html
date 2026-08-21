@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Welcome to Cosmas</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/channel-links.js" defer></script>
 </head>
 <body>
-  <section class="block wrap narrow" style="text-align:center; padding-top:120px; min-height:70vh;">
+  <main id="main-content" class="block wrap narrow" style="text-align:center; padding-top:120px; min-height:70vh;">
     <svg class="pulse-hero" viewBox="0 0 680 120" role="img" aria-label="Heartbeat that peaks into a cross" style="margin-bottom:32px;">
       <path class="draw c-pulse" d="M20 76 H250 l10 12 l10 -12 H300 L322 24 L344 76 H400 l9 -11 l9 11 H660" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
       <path class="c-cross" d="M306 40 H338" fill="none" stroke-width="5" stroke-linecap="round"/>
@@ -18,10 +19,10 @@
     <p class="eyebrow">Welcome to Cosmas</p>
     <h1 style="font-size:clamp(32px,5vw,52px);">Let's finish setting you up.</h1>
     <p class="lead" style="color:var(--ink-soft); font-size:19px; max-width:52ch; margin:16px auto 32px;">
-      Create your Cosmas login with your practice work email, name the covered entity, and accept the BAA. Every practice starts with a free two-week trial, and billing is handled inside Cosmas.
+      Create your Cosmas login with your practice work email, name the covered entity, and accept the BAA. Every practice starts with a free two-week trial; finish setup inside Cosmas.
     </p>
-    <a href="https://app.cosmaneura.com/sign-up" class="btn btn-primary">Create your Cosmas login</a>
+    <a href="https://app.cosmaneura.com/sign-up?channel=direct" class="btn btn-primary" data-preserve-channel>Create your Cosmas login</a>
     <p style="margin-top:14px;"><a href="/">Back to home</a></p>
-  </section>
+  </main>
 </body>
 </html>
