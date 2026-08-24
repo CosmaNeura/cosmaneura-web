@@ -363,9 +363,19 @@ test("public copy does not promise unverified or inactive features", () => {
   assert.doesNotMatch(publicCopy, /cancel anytime/i);
   assert.doesNotMatch(publicCopy, /invite-only|MCD invite/i);
   assert.doesNotMatch(publicCopy, /MCD has on file/i);
-  assert.doesNotMatch(publicCopy, /pastoral pack|parish (?:correspondence|pathways)/i);
+  assert.doesNotMatch(publicCopy, /parish (?:correspondence|pathways)/i);
   assert.doesNotMatch(publicCopy, /NFP and fertility/i);
   assert.match(read("mcd.html"), /Limited Cosmas rollout for MyCatholicDoctor work-email users/);
+});
+
+test("the pastoral pack is clearly presented as unavailable and coming soon", () => {
+  const catholic = read("catholic.html");
+
+  assert.match(catholic, /<h3>Pastoral pack<\/h3>/);
+  assert.match(catholic, /<strong>Coming soon\.<\/strong>/);
+  assert.match(catholic, /not available today/i);
+  assert.doesNotMatch(catholic, /pastoral pack is (?:on|available)/i);
+  assert.doesNotMatch(catholic, /pastoral pack is an entitlement you turn on/i);
 });
 
 test("the custom-numbered MCD rollout retains list semantics", () => {
