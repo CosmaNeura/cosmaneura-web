@@ -4,7 +4,10 @@ name: Uptime
 # unreachable. Curl retries transient blips before declaring an outage.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # Keep the private-repository Actions budget available for release jobs.
+    # Move this probe to an external uptime service before restoring a shorter
+    # interval; GitHub-hosted schedules bill one job for every invocation.
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 jobs:

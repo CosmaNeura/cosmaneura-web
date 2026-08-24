@@ -1,6 +1,0 @@
-# Copy to `.dev.vars` for local testing with `wrangler pages dev` (never commit real keys).
-# In production these are set in Cloudflare Pages → Settings → Environment variables.
-
-STRIPE_SECRET_KEY=sk_test_xxx
-STRIPE_PRICE_ID=price_xxx
-STRIPE_WEBHOOK_SECRET=whsec_xxx

@@ -12,6 +12,9 @@
   --blue: #2F7DC4;
   --blue-deep: #23608F;
   --coral: #E4788D;
+  --button-bg: #23608F;
+  --button-bg-hover: #194A70;
+  --focus-ring: #A63256;
   --line: #DAE3F1;
   --navy-band: #16234E;
   --on-navy: #E9F0FB;
@@ -22,6 +25,7 @@
     --paper: #090F26; --surface: #101B3B; --panel: #0D1631;
     --heading: #EBF1FC; --ink: #D6DEF3; --ink-soft: #909DBF;
     --blue: #77ADE4; --blue-deep: #9CC6EF; --line: #24314F;
+    --button-bg: #295C8A; --button-bg-hover: #1D486E; --focus-ring: #FF98AC;
     --navy-band: #0C1430; --on-navy: #E9F0FB; --on-navy-soft: #97A5C8;
   }
 }
@@ -36,8 +40,17 @@ body {
 .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
 .narrow { max-width: 720px; }
 a { color: var(--blue-deep); }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid var(--focus-ring); outline-offset: 3px;
+}
+.skip-link {
+  position: fixed; left: 16px; top: 12px; z-index: 100;
+  padding: 10px 14px; border-radius: 8px; background: var(--surface);
+  color: var(--heading); font-weight: 700; transform: translateY(-180%);
+}
+.skip-link:focus { transform: translateY(0); }
 h1, h2, h3 { color: var(--heading); font-family: var(--serif); font-weight: 400; letter-spacing: -.012em; text-wrap: balance; }
-.eyebrow { font-family: var(--geo); font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--blue); font-weight: 600; margin: 0 0 18px; }
+.eyebrow { font-family: var(--geo); font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--blue-deep); font-weight: 600; margin: 0 0 18px; }
 
 /* logo + icon colors — set via CSS so custom properties + theme resolve */
 .c-cosma { fill: var(--blue); }
@@ -53,12 +66,12 @@ h1, h2, h3 { color: var(--heading); font-family: var(--serif); font-weight: 400;
   transition: transform .15s ease, background .15s ease;
 }
 .btn:hover { transform: translateY(-1px); }
-.btn-primary { background: var(--blue); color: #fff; }
-.btn-primary:hover { background: var(--blue-deep); }
+.btn-primary { background: var(--button-bg); color: #fff; }
+.btn-primary:hover { background: var(--button-bg-hover); }
 .btn-ghost { background: transparent; color: var(--heading); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--blue); }
 
-nav {
+body > nav {
   position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
   background: color-mix(in srgb, var(--paper) 82%, transparent);
   border-bottom: 1px solid var(--line);
@@ -68,7 +81,17 @@ nav {
 .nav-links a { color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 500; }
 .nav-links a:hover { color: var(--heading); }
 .nav-links .btn { color: #fff; }
-@media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } }
+@media (max-width: 900px) { .nav-links a:not(.btn) { display: none; } }
+@media (max-width: 520px) {
+  .nav-in { height: auto; min-height: 68px; gap: 10px; padding: 8px 16px; }
+  .nav-in > a:first-child { flex: 0 1 auto; min-width: 0; }
+  body > nav .brand { display: block; width: 120px; height: auto; }
+  .nav-links { gap: 0; min-width: 0; }
+  .nav-links .btn {
+    min-height: 44px; padding: 9px 11px; font-size: 12.5px; line-height: 1.2;
+    text-align: center; white-space: nowrap;
+  }
+}
 
 .hero { text-align: center; padding: 92px 0 40px; }
 .hero h1 { font-size: clamp(38px, 6vw, 66px); line-height: 1.05; margin: 0 auto 22px; max-width: 15ch; }
@@ -102,7 +125,7 @@ section.block { padding: 84px 0; }
 .mile { position: relative; padding: 0 0 34px; }
 .mile:last-child { padding-bottom: 0; }
 .mile::before { content: ""; position: absolute; left: -37px; top: 4px; width: 12px; height: 12px; border-radius: 999px; background: var(--blue); box-shadow: 0 0 0 4px var(--paper); }
-.mile .when { font-family: var(--geo); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); font-weight: 600; }
+.mile .when { font-family: var(--geo); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue-deep); font-weight: 600; }
 .mile h3 { font-family: var(--sans); font-size: 19px; font-weight: 700; margin: 4px 0 2px; }
 .mile p { margin: 0; color: var(--ink-soft); font-size: 15px; }
 
@@ -132,7 +155,7 @@ input, textarea, select {
   width: 100%; font-family: var(--sans); font-size: 15px; padding: 11px 13px;
   border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink);
 }
-input:focus, textarea:focus, select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; border-color: var(--blue-deep); }
 textarea { resize: vertical; min-height: 84px; }
 
 footer { border-top: 1px solid var(--line); padding: 44px 0; }
@@ -174,6 +197,6 @@ ol.rollout { counter-reset: step; }
 .legal h2 { font-family: var(--sans); font-size: 19px; font-weight: 700; margin: 36px 0 10px; color: var(--heading); }
 .legal p, .legal li { color: var(--ink); font-size: 15.5px; }
 .legal ul { padding-left: 22px; margin: 10px 0; display: grid; gap: 6px; }
-.legal a { color: var(--blue); }
+.legal a { color: var(--blue-deep); }
 .legal .callout { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
 .legal .callout p { margin: 0; }

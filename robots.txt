@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /success
 
 Sitemap: https://cosmaneura.com/sitemap.xml

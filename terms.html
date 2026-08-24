@@ -16,12 +16,13 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-  <nav>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav aria-label="Primary">
     <div class="wrap nav-in">
       <a href="/" aria-label="Cosmas home">
         <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
@@ -36,12 +37,12 @@
       </a>
       <div class="nav-links">
         <a href="/">Cosmas</a><a href="/baa">BAA</a><a href="mailto:info@cosmaneura.com">Contact</a>
-        <a href="https://app.cosmaneura.com/sign-up" class="btn btn-primary">Continue in Cosmas</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=direct" class="btn btn-primary">Continue in Cosmas</a>
       </div>
     </div>
   </nav>
 
-  <section class="legal wrap narrow">
+  <main id="main-content" class="legal wrap narrow">
     <p class="eyebrow">Legal</p>
     <h1>Terms of Service</h1>
     <p class="updated">Last updated: August 20, 2026</p>
@@ -78,7 +79,7 @@
     </ul>
 
     <h2>6. Your data and our platform</h2>
-    <p>As between you and Cosmaneura, you own the data you submit to the service. You grant us the rights needed to process it to provide the service, consistent with our <a href="privacy.html">Privacy Policy</a> and, where applicable, a BAA. Cosmaneura owns the platform, software, and branding. If you send us feedback, we may use it without obligation to you.</p>
+    <p>As between you and Cosmaneura, you own the data you submit to the service. You grant us the rights needed to process it to provide the service, consistent with our <a href="/privacy">Privacy Policy</a> and, where applicable, a BAA. Cosmaneura owns the platform, software, and branding. If you send us feedback, we may use it without obligation to you.</p>
 
     <h2>7. Disclaimers</h2>
     <p>The service is provided "as is" and "as available." To the fullest extent permitted by law, we disclaim all warranties, express or implied, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the service will be uninterrupted, error-free, or that AI-generated output will be accurate or complete.</p>
@@ -98,7 +99,7 @@
     <h2>12. Contact</h2>
     <p>Cosmaneura · New Hampshire, USA<br>
     <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a></p>
-  </section>
+  </main>
 
   <footer>
     <div class="wrap foot-in">
@@ -114,7 +115,7 @@
         </svg>
         <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
       </div>
-      <div class="foot-links">
+      <nav class="foot-links" aria-label="Footer">
         <a href="/">Independent clinics</a>
         <a href="/catholic">Catholic practices</a>
         <a href="/mcd">MyCatholicDoctor</a>
@@ -122,9 +123,9 @@
         <a href="/baa">BAA</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="https://app.cosmaneura.com/sign-in?channel=direct">Sign in</a>
         <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
-      </div>
+      </nav>
     </div>
   </footer>
 </body>

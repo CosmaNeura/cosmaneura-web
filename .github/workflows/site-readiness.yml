@@ -1,0 +1,29 @@
+name: Site readiness
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify static site
+        run: |
+          node --test tests/site-readiness.test.mjs
+          node --check channel-links.js
+          node --check scripts/build-site.mjs
+          node --check scripts/smoke-live.mjs
+          node scripts/build-site.mjs

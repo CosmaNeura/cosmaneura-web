@@ -16,11 +16,12 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <nav>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav aria-label="Primary">
     <div class="wrap nav-in">
       <a href="/" aria-label="Cosmas home">
         <svg class="brand" width="168" height="34" viewBox="0 0 420 86" role="img" aria-label="Cosmas">
@@ -35,26 +36,28 @@
       </a>
       <div class="nav-links">
         <a href="/">Cosmas</a><a href="/baa">BAA</a><a href="mailto:info@cosmaneura.com">Contact</a>
-        <a href="https://app.cosmaneura.com/sign-up" class="btn btn-primary">Continue in Cosmas</a>
+        <a href="https://app.cosmaneura.com/sign-up?channel=direct" class="btn btn-primary">Continue in Cosmas</a>
       </div>
     </div>
   </nav>
+  <main id="main-content">
   <header class="hero wrap" id="top">
     <p class="eyebrow">The company</p>
     <h1>Cosmaneura Inc</h1>
     <p class="lead">Delaware C-corporation, headquartered in New Hampshire. Cosmas is the product. The business associate on your BAA is Cosmaneura Inc — never the wordmark alone.</p>
     <div class="cta-row">
-      <a href="/baa" class="btn btn-primary">Read the draft BAA</a>
+      <a href="/baa" class="btn btn-primary">Read the BAA</a>
       <a href="mailto:info@cosmaneura.com" class="btn btn-ghost">info@cosmaneura.com</a>
     </div>
   </header>
   <section class="block">
     <div class="wrap features">
-      <div class="feat reveal"><h3>Product</h3><p>Cosmas — capture, notes, coding queue, intake. One app for independent clinics, Catholic practices, and the MCD rollout.</p></div>
+      <div class="feat reveal"><h3>Product</h3><p>Cosmas — visit capture, draft clinical notes, and patient intake. One app for independent clinics, Catholic practices, and the MCD rollout.</p></div>
       <div class="feat reveal"><h3>Legal party</h3><p>Cosmaneura Inc signs the BAA with the practice. Workforce attests. There is not a second BAA per clinician.</p></div>
-      <div class="feat reveal"><h3>Not a second MyCatholicDoctor</h3><p>MCD remains the care network. Cosmas is the documentation layer those practices open after the invite.</p></div>
+      <div class="feat reveal"><h3>Not a second MyCatholicDoctor</h3><p>MCD remains the care network. Cosmas is the separate practice workflow used by participating clinicians.</p></div>
     </div>
   </section>
+  </main>
   <footer>
     <div class="wrap foot-in">
       <div>
@@ -69,7 +72,7 @@
         </svg>
         <div class="foot-meta" style="margin-top:8px;">Operated by Cosmaneura Inc · Delaware C-corp · New Hampshire · © 2026</div>
       </div>
-      <div class="foot-links">
+      <nav class="foot-links" aria-label="Footer">
         <a href="/">Independent clinics</a>
         <a href="/catholic">Catholic practices</a>
         <a href="/mcd">MyCatholicDoctor</a>
@@ -77,9 +80,9 @@
         <a href="/baa">BAA</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="https://app.cosmaneura.com/sign-in">Sign in</a>
+        <a href="https://app.cosmaneura.com/sign-in?channel=direct">Sign in</a>
         <a href="mailto:info@cosmaneura.com">info@cosmaneura.com</a>
-      </div>
+      </nav>
     </div>
   </footer>
   <script>
