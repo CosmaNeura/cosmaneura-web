@@ -5,8 +5,11 @@
 ## What this repository owns
 
 This repository is the static public website for Cosmaneura Inc and Cosmas. It
-is deployed from `main` to Cloudflare Pages with
-`node scripts/build-site.mjs` and the allowlisted `dist` directory as output.
+is promoted manually from reviewed `main` commits to Cloudflare Pages. The
+Cloudflare Git integration's automatic production build fails closed in
+`node scripts/build-site.mjs`; the founder-gated workflow builds and directly
+uploads the allowlisted `dist` directory. See
+`docs/PRODUCTION_PROMOTION.md`.
 
 The website currently owns marketing, company, privacy, terms, and public BAA
 pages. It does not own checkout, subscription webhooks, entitlement, PHI state,

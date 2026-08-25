@@ -23,10 +23,14 @@ matching practice work-email domain.
 
 ## Deploy
 
-Cloudflare Pages, connected to this repo. Build command =
-`node scripts/build-site.mjs`; output directory = `dist`; root directory = the
-repository default. The allowlisted build keeps repository guidance, tests,
-workflows, and scripts off the public site.
+Cloudflare Pages is connected to this repo. A merge to `main` does not publish:
+the configured `node scripts/build-site.mjs` command fails closed when the
+Cloudflare Git integration attempts a production-branch build. Production is
+built and directly uploaded only by the founder-gated **Promote production**
+workflow after an independent agent reviews the exact current `main` commit.
+See [`docs/PRODUCTION_PROMOTION.md`](docs/PRODUCTION_PROMOTION.md). The
+allowlisted build keeps repository guidance, tests, workflows, and scripts off
+the public site.
 Pretty paths are Cloudflare Pages HTML files (`catholic.html` → `/catholic`). Do not 200-rewrite those to `.html` — it 308-loops against Pages’ pretty URLs.
 
 This is a static Pages project: the deployed code requires no Pages Functions,
@@ -93,17 +97,22 @@ a shorter interval.
    directory at its repository default. Confirm there is no Functions/Worker
    code. After explicit approval, remove obsolete runtime variables before
    triggering a preview or production build; never expose their values.
-3. Merge through the normal reviewed path. Do not upload a second copy or add
+3. Merge through the normal reviewed path. The Cloudflare Git integration's
+   production build is expected to fail closed, leaving the current production
+   artifact live.
+4. Obtain and record an independent-agent review of the exact commit now at
+   `main`, then have `JohnClem` run **Promote production** as described in
+   `docs/PRODUCTION_PROMOTION.md`. Do not upload a second copy manually or add
    `.html` rewrites in the Cloudflare dashboard.
-4. After Pages reports success, verify `/`, `/catholic`, `/mcd`, `/company`,
+5. After Pages reports success, verify `/`, `/catholic`, `/mcd`, `/company`,
    `/baa`, `/privacy`, and `/terms`; confirm an unknown path and `/api/checkout`
    both return HTTP 404, not the home page with HTTP 200.
    Also confirm `/README.md`, `/CLAUDE.md`, `/tests/site-readiness.test.mjs`, and
    `/.github/workflows/uptime.yml` return 404.
-5. Inspect a live response for the `_headers` values and click one CTA from
+6. Inspect a live response for the `_headers` values and click one CTA from
    each door to confirm the app receives `channel=direct`, `channel=catholic`,
    and `channel=mcd` respectively.
-6. Operator cleanup remains outside this repo: delete the retired Stripe
+7. Operator cleanup remains outside this repo: delete the retired Stripe
    webhook endpoint only after confirming no traffic still depends on it.
 
 Rollback is artifact-first: reactivate the last known-good `891ac80`

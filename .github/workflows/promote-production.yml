@@ -1,0 +1,143 @@
+name: Promote production
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact, independently reviewed commit currently at main
+        required: true
+        type: string
+      agent_review_url:
+        description: PR comment URL containing the required agent-review record
+        required: true
+        type: string
+      confirmation:
+        description: Type PROMOTE COSMANEURA WEB
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: web-production-promotion
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Founder production promotion
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Authorize founder promotion
+        env:
+          ACTOR: ${{ github.actor }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          test "$EVENT_NAME" = "workflow_dispatch"
+          test "$REPOSITORY" = "CosmaNeura/cosmaneura-web"
+          test "$WORKFLOW_REF" = "refs/heads/main"
+          test "$ACTOR" = "JohnClem"
+          test "$TRIGGERING_ACTOR" = "JohnClem"
+          test "$CONFIRMATION" = "PROMOTE COSMANEURA WEB"
+
+      - name: Check out the exact release commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.release_sha }}
+
+      - name: Verify current main and independent-agent review
+        env:
+          EXPECTED_WORKFLOW_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          REVIEW_URL: ${{ inputs.agent_review_url }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "release_sha must be a full lowercase commit SHA" >&2
+            exit 1
+          fi
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          test "$EXPECTED_WORKFLOW_SHA" = "$RELEASE_SHA"
+
+          current_main="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          test "$current_main" = "$RELEASE_SHA"
+
+          review_pattern='^https://github\.com/CosmaNeura/cosmaneura-web/pull/([0-9]+)#issuecomment-([0-9]+)$'
+          if [[ ! "$REVIEW_URL" =~ $review_pattern ]]; then
+            echo "agent_review_url must be a cosmaneura-web PR comment URL" >&2
+            exit 1
+          fi
+          pull_number="${BASH_REMATCH[1]}"
+          comment_id="${BASH_REMATCH[2]}"
+
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$pull_number" --silent
+          review_record="$(gh api "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id")"
+          test "$(jq -r '.html_url' <<<"$review_record")" = "$REVIEW_URL"
+          test "$(jq -r '.issue_url' <<<"$review_record")" = \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pull_number"
+
+          review_body="$(jq -r '.body' <<<"$review_record")"
+          grep -Fqx "Independent agent review: PASS" <<<"$review_body"
+          grep -Fqx "Reviewed commit: $RELEASE_SHA" <<<"$review_body"
+          grep -Eq '^Reviewer agent: [^[:space:]].+$' <<<"$review_body"
+
+      - name: Build the reviewed artifact
+        run: |
+          set -euo pipefail
+          node --test tests/site-readiness.test.mjs
+          node --check channel-links.js
+          node --check scripts/build-site.mjs
+          node --check scripts/smoke-live.mjs
+          node scripts/build-site.mjs
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > "$RUNNER_TEMP/cosmaneura-web-files.sha256"
+          sha256sum "$RUNNER_TEMP/cosmaneura-web-files.sha256" | tee "$RUNNER_TEMP/cosmaneura-web-artifact.sha256"
+
+      - name: Upload reviewed artifact to Cloudflare Pages production
+        id: cloudflare
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: npm
+          wranglerVersion: "4.81.0"
+          preCommands: |
+            curl --fail --silent --show-error --retry 2 --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/cosmaneura-web" --output "$RUNNER_TEMP/cloudflare-pages-project.json"
+            jq -e '.success == true and .result.name == "cosmaneura-web" and .result.production_branch == "main"' "$RUNNER_TEMP/cloudflare-pages-project.json" > /dev/null
+            test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')" = "$RELEASE_SHA"
+          command: >-
+            pages deploy dist
+            --project-name=cosmaneura-web
+            --branch=main
+            --commit-hash=${{ inputs.release_sha }}
+            --commit-dirty=false
+
+      - name: Record promotion evidence
+        env:
+          DEPLOYMENT_URL: ${{ steps.cloudflare.outputs.deployment-url }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          REVIEW_URL: ${{ inputs.agent_review_url }}
+        run: |
+          {
+            echo "## Production promotion"
+            echo
+            echo "- Commit: \`$RELEASE_SHA\`"
+            echo "- Independent-agent review: $REVIEW_URL"
+            echo "- Cloudflare deployment: $DEPLOYMENT_URL"
+            echo "- Artifact manifest: \`$(cut -d ' ' -f 1 "$RUNNER_TEMP/cosmaneura-web-artifact.sha256")\`"
+          } >> "$GITHUB_STEP_SUMMARY"

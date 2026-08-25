@@ -19,7 +19,9 @@ Insights are target-state, not yet live in core prod.
 - Lint + typecheck: `n/a (no linter configured)`
 - Local dev: `open `index.html`, or `node scripts/build-site.mjs``
 - DB migration create: n/a — no database.
-- Deploy: Cloudflare Pages, not GitHub Actions to Azure. CI here only runs site-readiness tests and an uptime probe against the live domains.
+- Deploy: Cloudflare Pages, not Azure. Automatic production builds from `main`
+  fail closed. Only `.github/workflows/promote-production.yml` may upload
+  production after founder authorization and exact-commit agent review.
 
 ## Risk tiers (declare one on every PR)
 
@@ -66,6 +68,10 @@ Tier is set by the *paths a change touches*, never by urgency.
 
 - **Cloudflare Pages, not Azure.** The Azure mechanics in DEPLOYMENT.md do not apply
   here; the process rules (tiers, PR template, flight plans) do.
+- A merge is not a production promotion. Preserve the fail-closed Cloudflare
+  `main` build guard and follow `docs/PRODUCTION_PROMOTION.md`. Agent review is
+  required evidence tied to the exact promoted commit; it is not GitHub
+  approval or founder authorization.
 - No database, no migrations, no feature flags. Tier 0 is the normal case.
 - `baa.html` / `baa.pdf` are legally operative documents served to practices. Changing
   them is Tier 2 regardless of how small the diff looks, and needs founder sign-off.

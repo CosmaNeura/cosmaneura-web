@@ -5,6 +5,20 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const output = resolve(root, "dist");
 
+// Cloudflare's Git integration invokes this script for every branch build. A
+// successful build of the production branch publishes immediately, so main
+// must fail before dist exists. Production is built and uploaded only by the
+// founder-gated GitHub workflow, where these Cloudflare build variables are
+// not present. Preview branches remain available for review.
+if (
+  process.env.CF_PAGES === "1" &&
+  (!process.env.CF_PAGES_BRANCH || process.env.CF_PAGES_BRANCH === "main")
+) {
+  throw new Error(
+    "Automatic Cloudflare Pages production builds are disabled; use the reviewed manual production-promotion workflow.",
+  );
+}
+
 const publicAssets = [
   "404.html",
   "_headers",
