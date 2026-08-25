@@ -97,9 +97,10 @@ a shorter interval.
    directory at its repository default. Confirm there is no Functions/Worker
    code. After explicit approval, remove obsolete runtime variables before
    triggering a preview or production build; never expose their values.
-3. Merge through the normal reviewed path. The Cloudflare Git integration's
-   production build is expected to fail closed, leaving the current production
-   artifact live.
+3. Merge through the normal reviewed path. Cloudflare automatic production
+   deployments are disabled, so no production build should start. If the
+   account setting regresses, the repository guard must fail before creating
+   `dist`, leaving the current production artifact live.
 4. Obtain and record an independent-agent review of the exact commit now at
    `main`, then have `JohnClem` run **Promote production** as described in
    `docs/PRODUCTION_PROMOTION.md`. Do not upload a second copy manually or add

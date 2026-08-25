@@ -13,11 +13,11 @@ project.
 
 ## One-time setup
 
-First restrict the existing GitHub `production` environment's deployment
-branches to `main`. Then add these environment secrets. Do not put their values
-in repository-level secrets, the repository, PRs, comments, or logs.
+The GitHub `production` environment restricts deployment branches to `main`,
+and its Cloudflare account identifier is stored there. Before the first
+promotion, add the remaining environment secret below. Do not put secret values in
+repository-level secrets, the repository, PRs, comments, or logs.
 
-- `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN` — a dedicated, least-privilege token limited to Pages
   edit access for the Cosmaneura Cloudflare account
 
@@ -28,8 +28,10 @@ environment reviewer exists. The workflow itself admits only a manual run from
 
 ## Review and promote
 
-1. Merge through the repository's current PR process. An automatic Cloudflare
-   production build of the new `main` commit is expected to fail closed.
+1. Merge through the repository's current PR process. Cloudflare automatic
+   production deployments are disabled and no production build should start.
+   If account configuration regresses and one does start, the repository build
+   guard must fail before creating `dist`.
 2. Have a non-implementer agent review the exact commit now at `main`, including
    the cumulative diff that will be published. Agent review is evidence, not a
    GitHub approval and not founder authorization.
@@ -60,7 +62,6 @@ Reactivate the last known-good Cloudflare Pages artifact. Rollback does not
 authorize a rebuild or an unreviewed forward deployment. Record the rollback
 and its reason in the incident/change record, then rerun the live smoke test.
 
-The in-repository build guard is the immediate containment control. A later
-account-level change may disable automatic production builds cleanly and remove
-the expected failed-build noise, but it must be separately verified before the
-guard is relaxed.
+Account-side automatic production deployments are disabled. Preserve the
+in-repository build guard as defense in depth; do not relax it merely because
+the current account setting is correct.
