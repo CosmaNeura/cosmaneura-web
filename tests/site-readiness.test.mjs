@@ -283,6 +283,60 @@ test("the public build contains only the reviewed asset allowlist", () => {
   }
 });
 
+test("automatic Cloudflare production builds fail closed before creating dist", () => {
+  const output = join(root, "dist");
+  const buildScript = join(root, "scripts/build-site.mjs");
+  const cleanEnvironment = { ...process.env };
+  delete cleanEnvironment.CF_PAGES;
+  delete cleanEnvironment.CF_PAGES_BRANCH;
+  delete cleanEnvironment.CF_PAGES_COMMIT_SHA;
+  delete cleanEnvironment.CF_PAGES_URL;
+
+  try {
+    rmSync(output, { force: true, recursive: true });
+    const blocked = spawnSync(process.execPath, [buildScript], {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...cleanEnvironment,
+        CF_PAGES: "1",
+        CF_PAGES_BRANCH: "main",
+        CF_PAGES_COMMIT_SHA: "a".repeat(40),
+      },
+    });
+    assert.notEqual(blocked.status, 0);
+    assert.match(blocked.stderr, /Automatic Cloudflare Pages production builds are disabled/);
+    assert.equal(existsSync(output), false);
+
+    const missingBranch = spawnSync(process.execPath, [buildScript], {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...cleanEnvironment,
+        CF_PAGES: "1",
+        CF_PAGES_COMMIT_SHA: "b".repeat(40),
+      },
+    });
+    assert.notEqual(missingBranch.status, 0);
+    assert.equal(existsSync(output), false);
+
+    const preview = spawnSync(process.execPath, [buildScript], {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...cleanEnvironment,
+        CF_PAGES: "1",
+        CF_PAGES_BRANCH: "codex/manual-production-promotion",
+        CF_PAGES_COMMIT_SHA: "c".repeat(40),
+      },
+    });
+    assert.equal(preview.status, 0, preview.stderr);
+    assert.ok(existsSync(output));
+  } finally {
+    rmSync(output, { force: true, recursive: true });
+  }
+});
+
 test("pull requests run readiness checks without exhausting the uptime budget", () => {
   const readiness = read(".github/workflows/site-readiness.yml");
   const uptime = read(".github/workflows/uptime.yml");
@@ -295,6 +349,29 @@ test("pull requests run readiness checks without exhausting the uptime budget", 
   assert.match(readiness, /node --check scripts\/smoke-live\.mjs/);
   assert.match(uptime, /cron: "17 \*\/6 \* \* \*"/);
   assert.doesNotMatch(uptime, /\*\/15/);
+});
+
+test("production promotion is manual, founder-only, reviewed, and commit-bound", () => {
+  const workflow = read(".github/workflows/promote-production.yml");
+  const promotion = read("docs/PRODUCTION_PROMOTION.md");
+
+  assert.match(workflow, /^\s*workflow_dispatch:/m);
+  assert.doesNotMatch(workflow, /^\s*(?:push|pull_request|schedule):/m);
+  assert.match(workflow, /test "\$ACTOR" = "JohnClem"/);
+  assert.match(workflow, /test "\$TRIGGERING_ACTOR" = "JohnClem"/);
+  assert.match(workflow, /test "\$WORKFLOW_REF" = "refs\/heads\/main"/);
+  assert.match(workflow, /Independent agent review: PASS/);
+  assert.match(workflow, /Reviewed commit: \$RELEASE_SHA/);
+  assert.match(workflow, /git\/ref\/heads\/main/);
+  assert.equal((workflow.match(/git\/ref\/heads\/main/g) ?? []).length, 2);
+  assert.match(workflow, /preCommands:/);
+  assert.match(workflow, /api\.cloudflare\.com\/client\/v4\/accounts/);
+  assert.match(workflow, /\.result\.production_branch == "main"/);
+  assert.match(workflow, /cloudflare\/wrangler-action@[0-9a-f]{40}/);
+  assert.match(workflow, /--commit-hash=\$\{\{ inputs\.release_sha \}\}/);
+  assert.match(promotion, /Agent review is evidence, not a\s+GitHub approval/);
+  assert.match(promotion, /environment is an audit boundary, not a claim/);
+  assert.match(promotion, /deployment\s+branches to `main`/);
 });
 
 test("Cloudflare Pages configuration adds safe headers without rewrites", () => {

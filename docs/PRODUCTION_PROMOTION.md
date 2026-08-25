@@ -1,0 +1,66 @@
+# Production promotion
+
+Cloudflare Pages is connected to this repository, but a merge to `main` is not
+authorization to publish. `scripts/build-site.mjs` deliberately fails before
+creating `dist` when Cloudflare's Git integration tries to build `main`.
+Preview-branch builds remain available. The last successful production
+deployment remains live when the blocked automatic build fails.
+
+The only intended production path is the **Promote production** GitHub Actions
+workflow. It builds the selected commit in GitHub Actions and uploads the
+allowlisted `dist` artifact directly to the existing `cosmaneura-web` Pages
+project.
+
+## One-time setup
+
+First restrict the existing GitHub `production` environment's deployment
+branches to `main`. Then add these environment secrets. Do not put their values
+in repository-level secrets, the repository, PRs, comments, or logs.
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN` — a dedicated, least-privilege token limited to Pages
+  edit access for the Cosmaneura Cloudflare account
+
+The repository is private and the founder is the production authority. The
+environment is an audit boundary, not a claim that a separate GitHub
+environment reviewer exists. The workflow itself admits only a manual run from
+`main` where both `github.actor` and `github.triggering_actor` are `JohnClem`.
+
+## Review and promote
+
+1. Merge through the repository's current PR process. An automatic Cloudflare
+   production build of the new `main` commit is expected to fail closed.
+2. Have a non-implementer agent review the exact commit now at `main`, including
+   the cumulative diff that will be published. Agent review is evidence, not a
+   GitHub approval and not founder authorization.
+3. Record the result in a comment on the merged PR with these exact lines:
+
+   ```text
+   Independent agent review: PASS
+   Reviewed commit: <full 40-character main SHA>
+   Reviewer agent: <agent name or task identifier>
+   ```
+
+4. As `JohnClem`, run **Promote production** from `main`. Supply the exact
+   reviewed SHA, the review comment URL, and `PROMOTE COSMANEURA WEB`.
+5. The workflow checks that the requested SHA is current `main` before building.
+   After installing the pinned deployment client, its final pre-deploy commands
+   verify that the Pages project's production branch is `main` and recheck the
+   GitHub ref immediately before the first Cloudflare mutation. The run summary
+   records the review URL, commit, deployment URL, and artifact-manifest digest.
+6. Run the read-only live smoke test and inspect the Cloudflare deployment.
+
+If `main` changes after review, stop and obtain a new review of the new exact
+commit. Do not promote a stale commit. A failed workflow before the upload step
+does not mutate Cloudflare.
+
+## Rollback
+
+Reactivate the last known-good Cloudflare Pages artifact. Rollback does not
+authorize a rebuild or an unreviewed forward deployment. Record the rollback
+and its reason in the incident/change record, then rerun the live smoke test.
+
+The in-repository build guard is the immediate containment control. A later
+account-level change may disable automatic production builds cleanly and remove
+the expected failed-build noise, but it must be separately verified before the
+guard is relaxed.
