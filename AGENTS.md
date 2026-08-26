@@ -116,8 +116,10 @@ be released independently.
 
 ### Repo notes
 
-- **Cloudflare Pages, not Azure.** The Azure mechanics in DEPLOYMENT.md do not apply
-  here; the process rules (tiers, PR template, flight plans) do.
+- **Cloudflare Pages, not Azure.** The operational deployment source is
+  `docs/PRODUCTION_PROMOTION.md`; do not import Azure mechanics from another
+  repository. The shared process rules (tiers, PR template, flight plans) still
+  apply.
 - A merge is not a production promotion. Preserve the fail-closed Cloudflare
   `main` build guard and follow `docs/PRODUCTION_PROMOTION.md`. Agent review is
   required evidence tied to the exact promoted commit; it is not GitHub
