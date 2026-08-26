@@ -87,6 +87,15 @@ temporary GitHub-hosted uptime probe runs every six hours to conserve the
 private-repository Actions budget; move it to a dedicated monitor before using
 a shorter interval.
 
+Pull requests also receive a secretless `change-budget` status check from the
+trusted default-branch workflow. It rejects more than 2,000 changed lines
+(additions plus deletions) or 50 changed files, fails closed when GitHub's diff
+metadata is missing, malformed, or negative, and has no label, checkbox, or
+actor waiver. Oversized changes must be split into dependency-ordered pull
+requests. The workflow does not change human-approval settings; repository
+administration must separately require the `change-budget` status context for
+it to prevent a merge.
+
 ## Deployment checklist
 
 1. Run the deterministic checks above and confirm `baa.html` and
