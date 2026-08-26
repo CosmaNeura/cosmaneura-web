@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
   existsSync,
+  mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
 } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
@@ -38,6 +40,46 @@ const publicFiles = new Map([
   ["/sitemap.xml", "sitemap.xml"],
   ["/styles.css", "styles.css"],
 ]);
+
+function changeBudgetScript() {
+  const source = read(".github/workflows/change-budget.yml");
+  const marker = "        run: |\n";
+  const start = source.indexOf(marker);
+
+  assert.notEqual(start, -1, "change-budget workflow must contain an inline script");
+  return source
+    .slice(start + marker.length)
+    .split("\n")
+    .map((line) => line.replace(/^ {10}/, ""))
+    .join("\n");
+}
+
+function runChangeBudget({ additions, deletions, changedFiles }) {
+  const directory = mkdtempSync(join(tmpdir(), "cosmaneura-change-budget-"));
+  const environment = {
+    ...process.env,
+    ADDITIONS: additions,
+    DELETIONS: deletions,
+    CHANGED_FILES: changedFiles,
+    MAX_CHANGED_LINES: "2000",
+    MAX_CHANGED_FILES: "50",
+    GITHUB_STEP_SUMMARY: join(directory, "summary.md"),
+  };
+
+  for (const name of ["ADDITIONS", "DELETIONS", "CHANGED_FILES"]) {
+    if (environment[name] === undefined) delete environment[name];
+  }
+
+  try {
+    return spawnSync("bash", ["-c", changeBudgetScript()], {
+      cwd: root,
+      encoding: "utf8",
+      env: environment,
+    });
+  } finally {
+    rmSync(directory, { force: true, recursive: true });
+  }
+}
 
 function hrefs(html) {
   return [...html.matchAll(/\bhref="([^"]+)"/g)].map((match) => match[1]);
@@ -349,6 +391,78 @@ test("pull requests run readiness checks without exhausting the uptime budget", 
   assert.match(readiness, /node --check scripts\/smoke-live\.mjs/);
   assert.match(uptime, /cron: "17 \*\/6 \* \* \*"/);
   assert.doesNotMatch(uptime, /\*\/15/);
+});
+
+test("change budget uses trusted metadata with fixed, waiver-free limits", () => {
+  const workflow = read(".github/workflows/change-budget.yml");
+  const trigger = workflow.slice(0, workflow.indexOf("permissions:"));
+
+  assert.match(trigger, /^\s*pull_request_target:/m);
+  assert.doesNotMatch(trigger, /^\s*pull_request:/m);
+  assert.doesNotMatch(trigger, /workflow_dispatch/);
+  assert.match(workflow, /^permissions: \{\}$/m);
+  assert.match(
+    workflow,
+    /^\s*ADDITIONS: \$\{\{ github\.event\.pull_request\.additions \}\}$/m,
+  );
+  assert.match(
+    workflow,
+    /^\s*DELETIONS: \$\{\{ github\.event\.pull_request\.deletions \}\}$/m,
+  );
+  assert.match(
+    workflow,
+    /^\s*CHANGED_FILES: \$\{\{ github\.event\.pull_request\.changed_files \}\}$/m,
+  );
+  assert.match(workflow, /^\s*MAX_CHANGED_LINES: '2000'$/m);
+  assert.match(workflow, /^\s*MAX_CHANGED_FILES: '50'$/m);
+  assert.doesNotMatch(workflow, /^\s*uses:/m);
+  assert.doesNotMatch(workflow, /checkout|github\.event\.pull_request\.head/i);
+  assert.doesNotMatch(workflow, /\bsecrets\./);
+
+  for (const waiver of ["label", "checkbox", "admin", "continue-on-error"]) {
+    assert.doesNotMatch(workflow, new RegExp(waiver, "i"));
+  }
+});
+
+test("change budget accepts the exact line and file boundaries", () => {
+  for (const metrics of [
+    { additions: "2000", deletions: "0", changedFiles: "50" },
+    { additions: "1000", deletions: "1000", changedFiles: "50" },
+    { additions: "0", deletions: "0", changedFiles: "0" },
+  ]) {
+    const result = runChangeBudget(metrics);
+    assert.equal(result.status, 0, result.stderr);
+  }
+});
+
+test("change budget rejects changes above either limit", () => {
+  for (const metrics of [
+    { additions: "2001", deletions: "0", changedFiles: "50" },
+    { additions: "1000", deletions: "1001", changedFiles: "50" },
+    { additions: "2000", deletions: "0", changedFiles: "51" },
+  ]) {
+    const result = runChangeBudget(metrics);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stdout, /too large for one reliable review/);
+  }
+});
+
+test("change budget fails closed on missing, malformed, or negative metrics", () => {
+  const valid = {
+    additions: "1",
+    deletions: "1",
+    changedFiles: "1",
+  };
+
+  for (const field of Object.keys(valid)) {
+    for (const invalidValue of [undefined, "not-a-number", "-1"]) {
+      const metrics = { ...valid, [field]: invalidValue };
+      const result = runChangeBudget(metrics);
+
+      assert.notEqual(result.status, 0, `${field}=${invalidValue}`);
+      assert.match(result.stdout, /Missing or invalid pull-request metric/);
+    }
+  }
 });
 
 test("production promotion is manual, founder-only, reviewed, and commit-bound", () => {
