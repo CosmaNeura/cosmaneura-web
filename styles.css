@@ -121,6 +121,20 @@ section.block { padding: 84px 0; }
 .feat h3 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin: 0 0 8px; }
 .feat p { margin: 0; color: var(--ink-soft); font-size: 15px; }
 
+.section-intro { margin: 14px 0 0; color: var(--ink-soft); max-width: 62ch; }
+.tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 38px; }
+.tool-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+.tool-card:last-child { grid-column: 1 / -1; }
+.tool-card-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.tool-card h3 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin: 0; }
+.tool-card p { margin: 12px 0 0; color: var(--ink-soft); font-size: 15px; }
+.availability { flex: 0 0 auto; border: 1px solid currentColor; border-radius: 999px; color: var(--blue-deep); font-size: 11px; font-weight: 700; letter-spacing: .04em; line-height: 1.2; padding: 5px 9px; text-transform: uppercase; }
+@media (max-width: 720px) {
+  .tool-grid { grid-template-columns: 1fr; }
+  .tool-card:last-child { grid-column: auto; }
+  .tool-card-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+}
+
 .journey { display: grid; gap: 0; margin-top: 40px; border-left: 2px solid var(--line); padding-left: 30px; }
 .mile { position: relative; padding: 0 0 34px; }
 .mile:last-child { padding-bottom: 0; }
@@ -143,6 +157,7 @@ section.block { padding: 84px 0; }
 .price-feats li { position: relative; padding-left: 28px; color: var(--ink); font-size: 15px; }
 .price-feats li::before { content: ""; position: absolute; left: 0; top: 7px; width: 14px; height: 8px; border-left: 2px solid var(--blue); border-bottom: 2px solid var(--blue); transform: rotate(-45deg); }
 .price-note { font-size: 13px; color: var(--ink-soft); margin: 16px 0 0; }
+.price-seat-limit { font-size: 14px; color: var(--ink); margin: 20px 0; }
 
 .demo { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: start; }
 @media (max-width: 820px) { .demo { grid-template-columns: 1fr; gap: 34px; } }

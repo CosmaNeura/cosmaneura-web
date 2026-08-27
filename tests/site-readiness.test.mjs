@@ -13,6 +13,12 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+import {
+  capabilityStatuses,
+  productCapabilities,
+} from "../content/product-capabilities.mjs";
+import { createPreviewServer } from "../scripts/preview-server.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 const readBytes = (path) => readFileSync(join(root, path));
@@ -83,6 +89,28 @@ function runChangeBudget({ additions, deletions, changedFiles }) {
 
 function hrefs(html) {
   return [...html.matchAll(/\bhref="([^"]+)"/g)].map((match) => match[1]);
+}
+
+function buildSite() {
+  const build = spawnSync(process.execPath, [join(root, "scripts/build-site.mjs")], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  assert.equal(build.status, 0, build.stderr);
+  return join(root, "dist");
+}
+
+function artifactManifest(output) {
+  return readdirSync(output)
+    .sort()
+    .map((path) => `${path}:${sha256(readFileSync(join(output, path)))}`);
+}
+
+function closeServer(server) {
+  if (!server.listening) return Promise.resolve();
+  return new Promise((resolveClose, rejectClose) => {
+    server.close((error) => (error ? rejectClose(error) : resolveClose()));
+  });
 }
 
 function relativeLuminance(hex) {
@@ -165,7 +193,15 @@ test("three-door app links preserve the source channel", () => {
 
     assert.ok(appLinks.length > 0, `${page}: expected at least one app link`);
     for (const href of appLinks) {
-      assert.equal(new URL(href).searchParams.get("channel"), expectedChannel, href);
+      const destination = new URL(href);
+      assert.equal(destination.origin, "https://app.cosmaneura.com", href);
+      assert.ok(
+        ["/sign-in", "/sign-up"].includes(destination.pathname),
+        `${page}: unexpected production app route ${destination.pathname}`,
+      );
+      assert.deepEqual([...destination.searchParams.keys()], ["channel"], href);
+      assert.equal(destination.searchParams.get("channel"), expectedChannel, href);
+      assert.equal(destination.hash, "", href);
     }
   }
 
@@ -185,6 +221,7 @@ test("public pages expose one main landmark and visible keyboard focus", () => {
     if (html.includes("<nav")) {
       assert.match(html, /<nav aria-label="Primary">/, page);
       assert.match(html, /<a class="skip-link" href="#main-content">/, page);
+      assert.match(html, /<body>\s*<a class="skip-link" href="#main-content">/, page);
     }
     if (html.includes("<footer")) {
       assert.match(html, /<nav class="foot-links" aria-label="Footer">/, page);
@@ -196,12 +233,47 @@ test("public pages expose one main landmark and visible keyboard focus", () => {
   assert.match(css, /\.skip-link:focus/);
 });
 
+test("every editable-page link has an accessible name", () => {
+  for (const page of htmlPages.filter((path) => path !== "baa.html")) {
+    const html = read(page);
+    const anchors = [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)];
+    assert.ok(anchors.length > 0, page);
+
+    for (const [, attributes, body] of anchors) {
+      const ariaLabel = attributes.match(/\baria-label="([^"]+)"/)?.[1] ?? "";
+      const visibleText = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+      assert.ok(ariaLabel.trim() || visibleText, `${page}: unnamed link ${attributes}`);
+    }
+  }
+});
+
+test("the home-page keyboard order starts with skip, navigation, and primary CTA", () => {
+  const home = read("index.html");
+  const body = home.slice(home.indexOf("<body>"));
+  assert.deepEqual(hrefs(body).slice(0, 6), [
+    "#main-content",
+    "/",
+    "#tools",
+    "#pricing",
+    "/catholic",
+    "https://app.cosmaneura.com/sign-up?channel=direct",
+  ]);
+});
+
 test("foreground, button, and focus colors meet WCAG contrast thresholds", () => {
   const css = read("styles.css");
   const tokens = Object.fromEntries(
-    ["paper", "surface", "blue-deep", "button-bg", "focus-ring"].map(
-      (token) => [token, themeColors(css, token)],
-    ),
+    [
+      "paper",
+      "surface",
+      "panel",
+      "heading",
+      "ink-soft",
+      "blue",
+      "blue-deep",
+      "button-bg",
+      "focus-ring",
+    ].map((token) => [token, themeColors(css, token)]),
   );
 
   for (const [token, values] of Object.entries(tokens)) {
@@ -211,6 +283,10 @@ test("foreground, button, and focus colors meet WCAG contrast thresholds", () =>
   const themes = [0, 1].map((index) => ({
     paper: tokens.paper[index],
     surface: tokens.surface[index],
+    panel: tokens.panel[index],
+    heading: tokens.heading[index],
+    softText: tokens["ink-soft"][index],
+    blue: tokens.blue[index],
     text: tokens["blue-deep"][index],
     button: tokens["button-bg"][index],
     focus: tokens["focus-ring"][index],
@@ -218,6 +294,12 @@ test("foreground, button, and focus colors meet WCAG contrast thresholds", () =>
 
   for (const theme of themes) {
     assert.ok(contrast(theme.text, theme.paper) >= 4.5, theme);
+    assert.ok(contrast(theme.text, theme.surface) >= 4.5, theme);
+    assert.ok(contrast(theme.heading, theme.paper) >= 4.5, theme);
+    assert.ok(contrast(theme.softText, theme.paper) >= 4.5, theme);
+    assert.ok(contrast(theme.softText, theme.surface) >= 4.5, theme);
+    assert.ok(contrast(theme.softText, theme.panel) >= 4.5, theme);
+    assert.ok(contrast(theme.blue, theme.panel) >= 3, theme);
     assert.ok(contrast("#FFFFFF", theme.button) >= 4.5, theme);
     assert.ok(contrast(theme.focus, theme.paper) >= 3, theme);
     assert.ok(contrast(theme.focus, theme.surface) >= 3, theme);
@@ -249,11 +331,19 @@ test("canonical metadata, sitemap, and robots cover the indexable pages", () => 
     .map((match) => match[1])
     .sort();
   assert.deepEqual(sitemapUrls, [...indexablePages.values()].sort());
-  assert.match(
-    sitemap,
-    /<loc>https:\/\/cosmaneura\.com\/baa<\/loc><lastmod>2026-08-20<\/lastmod>/,
+  const sitemapDates = new Map(
+    [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod><\/url>/g)]
+      .map(([, location, lastModified]) => [location, lastModified]),
   );
-  assert.equal((sitemap.match(/<lastmod>2026-08-21<\/lastmod>/g) ?? []).length, 6);
+  assert.deepEqual(sitemapDates, new Map([
+    ["https://cosmaneura.com/", "2026-08-27"],
+    ["https://cosmaneura.com/catholic", "2026-08-27"],
+    ["https://cosmaneura.com/mcd", "2026-08-27"],
+    ["https://cosmaneura.com/company", "2026-08-27"],
+    ["https://cosmaneura.com/baa", "2026-08-20"],
+    ["https://cosmaneura.com/privacy", "2026-08-21"],
+    ["https://cosmaneura.com/terms", "2026-08-21"],
+  ]));
 
   const robots = read("robots.txt");
   assert.doesNotMatch(robots, /^Disallow: \/success$/m);
@@ -294,11 +384,7 @@ test("the public build contains only the reviewed asset allowlist", () => {
   const output = join(root, "dist");
 
   try {
-    const build = spawnSync(process.execPath, [join(root, "scripts/build-site.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    assert.equal(build.status, 0, build.stderr);
+    buildSite();
     assert.deepEqual(readdirSync(output).sort(), [
       "404.html",
       "_headers",
@@ -320,7 +406,65 @@ test("the public build contains only the reviewed asset allowlist", () => {
       "success.html",
       "terms.html",
     ]);
+    for (const forbidden of [
+      ".git",
+      ".github",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md",
+      "content",
+      "scripts",
+      "tests",
+    ]) {
+      assert.equal(existsSync(join(output, forbidden)), false, forbidden);
+    }
+    assert.equal(
+      readdirSync(output).some((path) => path.startsWith(".") || path.endsWith(".map")),
+      false,
+    );
+    const firstManifest = artifactManifest(output);
+    buildSite();
+    assert.deepEqual(artifactManifest(output), firstManifest);
   } finally {
+    rmSync(output, { force: true, recursive: true });
+  }
+});
+
+test("the built preview returns real 404 responses for non-public paths", async () => {
+  const output = join(root, "dist");
+  const server = createPreviewServer({ artifactRoot: buildSite() });
+
+  try {
+    await new Promise((resolveListen, rejectListen) => {
+      server.once("error", rejectListen);
+      server.listen(0, "127.0.0.1", resolveListen);
+    });
+    const address = server.address();
+    assert.equal(typeof address, "object");
+    const origin = `http://127.0.0.1:${address.port}`;
+
+    for (const path of ["/", "/catholic", "/mcd", "/privacy", "/terms"]) {
+      assert.equal((await fetch(`${origin}${path}`)).status, 200, path);
+    }
+
+    for (const path of [
+      "/README.md",
+      "/CLAUDE.md",
+      "/.git/config",
+      "/.github/workflows/site-readiness.yml",
+      "/tests/site-readiness.test.mjs",
+      "/styles.css.map",
+      "/api/checkout",
+      "/api/webhook",
+      "/api/book-demo",
+      "/not-a-public-route",
+    ]) {
+      const response = await fetch(`${origin}${path}`);
+      assert.equal(response.status, 404, path);
+      assert.match(await response.text(), /Page not found — Cosmas/, path);
+    }
+  } finally {
+    await closeServer(server);
     rmSync(output, { force: true, recursive: true });
   }
 });
@@ -556,7 +700,95 @@ test("public copy does not promise unverified or inactive features", () => {
   assert.doesNotMatch(publicCopy, /MCD has on file/i);
   assert.doesNotMatch(publicCopy, /parish (?:correspondence|pathways)/i);
   assert.doesNotMatch(publicCopy, /NFP and fertility/i);
+  assert.doesNotMatch(publicCopy, /\$99/i);
+  assert.doesNotMatch(publicCopy, /captures? the visit/i);
   assert.match(read("mcd.html"), /Limited Cosmas rollout for MyCatholicDoctor work-email users/);
+});
+
+test("paid-pilot offer copy matches the confirmed billing and credential contract", () => {
+  for (const page of ["index.html", "catholic.html"]) {
+    const html = read(page);
+    assert.match(html, /\$89/, page);
+    assert.match(html, /per active clinician \/ month/, page);
+    assert.match(html, /20 active clinician seats per practice/i, page);
+    assert.match(html, /14-day trial begins at Checkout, before credential approval/i, page);
+    assert.match(html, /card is collected during onboarding/i, page);
+    assert.match(
+      html,
+      /Real-PHI capabilities remain locked while credential approval is pending/i,
+      page,
+    );
+  }
+
+  const success = read("success.html");
+  assert.match(success, /14-day trial begins at Checkout, before credential approval/i);
+  assert.match(success, /card is collected during onboarding/i);
+  assert.match(
+    success,
+    /Real-PHI capabilities remain locked while credential approval is pending/i,
+  );
+});
+
+test("one content source truthfully labels all five provider capabilities", () => {
+  assert.deepEqual(
+    productCapabilities.map(({ key }) => key),
+    ["soap_note", "intake_prep", "session_prep", "scribe", "cab"],
+  );
+  assert.deepEqual(
+    productCapabilities.map(({ status }) => status),
+    [
+      "paid_pilot_preview",
+      "paid_pilot_preview",
+      "coming_soon",
+      "coming_soon",
+      "coming_soon",
+    ],
+  );
+  assert.deepEqual(Object.keys(capabilityStatuses), [
+    "available",
+    "paid_pilot_preview",
+    "coming_soon",
+  ]);
+
+  const intake = productCapabilities.find(({ key }) => key === "intake_prep");
+  const session = productCapabilities.find(({ key }) => key === "session_prep");
+  const scribe = productCapabilities.find(({ key }) => key === "scribe");
+  const cab = productCapabilities.find(({ key }) => key === "cab");
+  assert.match(intake.description, /patient-authored, five-question Visit Prep/i);
+  assert.match(intake.description, /configure the wording and order/i);
+  assert.match(session.description, /provider-only, read-only/i);
+  assert.match(scribe.description, /web and PWA capture comes first/i);
+  assert.match(scribe.description, /Desktop and native-mobile clients remain on the roadmap/i);
+  assert.match(cab.description, /Advisory recommendations/i);
+  assert.match(cab.description, /No EHR write or claim submission/i);
+
+  const output = join(root, "dist");
+  try {
+    buildSite();
+    const builtHome = readFileSync(join(output, "index.html"), "utf8");
+    assert.doesNotMatch(builtHome, /PRODUCT_CAPABILITY_CATALOG/);
+    for (const capability of productCapabilities) {
+      assert.equal(
+        (builtHome.match(new RegExp(`data-capability="${capability.key}"`, "g")) ?? [])
+          .length,
+        1,
+        capability.key,
+      );
+      assert.ok(builtHome.includes(capability.name), capability.name);
+      assert.ok(builtHome.includes(capabilityStatuses[capability.status]), capability.key);
+    }
+  } finally {
+    rmSync(output, { force: true, recursive: true });
+  }
+});
+
+test("marketing pages retain all three legal destinations", () => {
+  for (const page of ["index.html", "catholic.html", "mcd.html", "company.html"]) {
+    const destinations = new Set(hrefs(read(page)));
+    for (const legalPath of ["/baa", "/privacy", "/terms"]) {
+      assert.ok(destinations.has(legalPath), `${page}: missing ${legalPath}`);
+    }
+  }
 });
 
 test("the pastoral pack is clearly presented as unavailable and coming soon", () => {
