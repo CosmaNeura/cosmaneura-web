@@ -26,6 +26,26 @@ environment is an audit boundary, not a claim that a separate GitHub
 environment reviewer exists. The workflow itself admits only a manual run from
 `main` where both `github.actor` and `github.triggering_actor` are `JohnClem`.
 
+## Final pre-promotion gate
+
+Do not start the production workflow until the release change record shows a
+pass for every item below:
+
+- Complete one final copy check against the approved price, seat limit, trial
+  timing, card collection, credential gate, capability availability, and legal
+  links. Record the reviewer and exact `main` SHA.
+- Exercise the direct, Catholic, and MCD CTAs end to end with synthetic data.
+  Confirm channel attribution, the production app destination, authentication,
+  onboarding, test-mode Checkout, credential-pending behavior, entitlements,
+  first SOAP value, and Billing Portal. Do not use PHI or create a live charge.
+- Confirm both `CLOUDFLARE_ACCOUNT_ID` and the least-privilege
+  `CLOUDFLARE_API_TOKEN` exist in the GitHub `production` environment without
+  exposing their values.
+- Record the active Cloudflare production deployment ID, deployment URL, and
+  observation time as the exact rollback target.
+- Obtain explicit written founder approval for this exact reviewed `main` SHA.
+  Approval to merge or preview is not approval to promote.
+
 ## Review and promote
 
 1. In **Cloudflare → Workers & Pages → cosmaneura-web → Deployments**, record
