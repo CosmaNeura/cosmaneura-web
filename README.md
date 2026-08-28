@@ -28,6 +28,21 @@ capabilities remain locked while that approval is pending. The five product
 capabilities and their public rollout labels have one build-time source in
 `content/product-capabilities.mjs`; that source file is never published.
 
+Initial signup and onboarding do not request or require an NPI, and an NPI is
+not identity, security, or credential proof. This static site owns no signup
+form or NPI collection. Any future NPI request belongs in the application and
+must be just-in-time for an enabled payer-facing transaction or integration
+that actually requires it. CAB is billing intelligence and advisory only;
+claim submission, 837P generation, and clearinghouse enrollment are not on the
+roadmap.
+
+Known promotion blocker: the byte-pinned, counsel-approved BAA v2.2 currently
+includes “claims preparation and submission support” in Exhibit A. This change
+does not alter or reinterpret that legal agreement. Before promotion, counsel
+must either approve a new version, hashes, and version-bound acceptance flow or
+provide a written disposition that reconciles the existing clause with the
+owner-approved product policy.
+
 ## Deploy
 
 Cloudflare Pages is connected to this repo. A merge to `main` does not publish:
