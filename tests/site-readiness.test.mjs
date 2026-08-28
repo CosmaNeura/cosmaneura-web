@@ -726,27 +726,34 @@ test("public copy does not promise unverified or inactive features", () => {
   assert.match(read("mcd.html"), /Limited Cosmas rollout for MyCatholicDoctor work-email users/);
 });
 
-test("paid-pilot offer copy matches the confirmed billing and credential contract", () => {
+test("paid-pilot offer copy matches the confirmed billing and workforce-authority contract", () => {
   for (const page of ["index.html", "catholic.html"]) {
     const html = read(page);
     assert.match(html, /\$89/, page);
     assert.match(html, /per active clinician \/ month/, page);
     assert.match(html, /20 active clinician seats per practice/i, page);
-    assert.match(html, /14-day trial begins at Checkout, before credential approval/i, page);
+    assert.match(html, /14-day trial begins at Checkout/i, page);
     assert.match(html, /card is collected during onboarding/i, page);
     assert.match(
       html,
-      /Real-PHI capabilities remain locked while credential approval is pending/i,
+      /practice controls workforce membership/i,
       page,
     );
+    assert.match(html, /not credential or licensure review/i, page);
   }
 
   const success = read("success.html");
-  assert.match(success, /14-day trial begins at Checkout, before credential approval/i);
+  assert.match(success, /14-day trial begins at Checkout/i);
   assert.match(success, /card is collected during onboarding/i);
-  assert.match(
-    success,
-    /Real-PHI capabilities remain locked while credential approval is pending/i,
+  assert.match(success, /practice controls workforce membership/i);
+  assert.match(success, /not credential or licensure review/i);
+
+  const publicCopy = ["index.html", "catholic.html", "mcd.html", "success.html"]
+    .map(read)
+    .join("\n");
+  assert.doesNotMatch(
+    publicCopy,
+    /before credential approval|credential[- ]pending|locked until credential|credential approval is pending/i,
   );
 });
 

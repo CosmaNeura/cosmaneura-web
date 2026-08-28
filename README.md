@@ -23,8 +23,10 @@ matching practice work-email domain.
 
 The paid-pilot offer is $89 per active clinician per month for practices with
 at most 20 active clinician seats. A card is collected during onboarding and
-the 14-day trial begins at Checkout, before credential approval. Real-PHI
-capabilities remain locked while that approval is pending. The five product
+the 14-day trial begins at Checkout. Credential/licensure status does not gate
+signup, trial, billing, continued use, entitlement, or real-PHI access. The
+practice authorizes its workforce; the application separately enforces identity,
+membership/role, legal, subscription, tenant, consent, and rollout controls. The five product
 capabilities and their public rollout labels have one build-time source in
 `content/product-capabilities.mjs`; that source file is never published.
 
@@ -35,6 +37,11 @@ must be just-in-time for an enabled payer-facing transaction or integration
 that actually requires it. CAB is billing intelligence and advisory only;
 claim submission, 837P generation, clearinghouse enrollment, and EHR writeback
 are not on the roadmap.
+
+Cosmaneura must not claim that it verifies a provider's license or professional
+credentials merely because a practice authorized that user. Any legacy
+credential field is unverified informational metadata only and has no access,
+security, billing, or entitlement effect.
 
 Known promotion blocker: the byte-pinned, counsel-approved BAA v2.2 currently
 includes “claims preparation and submission support” in Exhibit A. This change

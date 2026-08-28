@@ -144,6 +144,11 @@ be released independently.
   integration that actually requires it. CAB remains billing intelligence and
   advisory only; claim submission, 837P generation, clearinghouse enrollment,
   and EHR writeback are not on the roadmap.
+- Provider credential/licensure status is informational only and must never gate
+  signup, trial, billing, continued use, entitlement, capability, or real-PHI
+  access. Practices authorize workforce membership and roles; the application
+  enforces identity, membership/role, legal, subscription, tenant, consent, and
+  rollout controls. Public copy must not imply Cosmaneura verifies licensure.
 - Preserve channel attribution without treating it as authorization.
 - `baa.html` and `baa.pdf` remain byte-pinned counsel-approved CN-BAA-CUST-CW
   v2.2; a substantive change needs a new version, counsel approval, and hashes.

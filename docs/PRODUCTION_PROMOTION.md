@@ -32,7 +32,7 @@ Do not start the production workflow until the release change record shows a
 pass for every item below:
 
 - Complete one final copy check against the approved price, seat limit, trial
-  timing, card collection, credential gate, capability availability, and legal
+  timing, card collection, credential-neutral workforce policy, capability availability, and legal
   links. Record the reviewer and exact `main` SHA.
 - Confirm initial signup and onboarding do not request or require an NPI and do
   not present NPI as identity, security, or credential proof. Confirm CAB is
@@ -41,6 +41,10 @@ pass for every item below:
   current or roadmap capabilities. Any future NPI collection must be
   just-in-time for an enabled payer-facing transaction or integration that
   actually requires it.
+- Confirm public copy says practices authorize workforce membership and roles,
+  does not claim Cosmaneura verifies licensure or credentials, and does not make
+  credential/licensure status a condition of signup, trial, billing, continued
+  use, entitlement, capability, or real-PHI access.
 - Resolve the counsel-approved BAA v2.2 Exhibit A phrase “claims preparation
   and submission support.” The BAA HTML and PDF are byte-pinned and must not be
   edited in place. Do not promote until counsel either approves a new version
@@ -50,7 +54,7 @@ pass for every item below:
 - Exercise the direct, Catholic, and MCD CTAs end to end with a signed-out,
   synthetic test session. Confirm channel attribution, the production app
   destination, authentication, onboarding, test-mode Checkout,
-  credential-pending behavior, entitlements, first SOAP value, and Billing
+  practice-authorized membership/role behavior, entitlements, first SOAP value, and Billing
   Portal. Inspect every signup and onboarding field and record that no NPI
   prompt or requirement appears and that NPI is not used to verify identity,
   account security, or credentials. Do not use PHI or create a live charge.
