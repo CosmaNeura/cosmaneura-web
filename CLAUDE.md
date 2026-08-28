@@ -29,6 +29,10 @@ storage here.
 - Keep `404.html` at the root so unknown and retired `/api/*` paths return 404.
 - Preserve `channel=direct`, `channel=catholic`, or `channel=mcd` on app CTAs
   outside the byte-pinned BAA page. Channel is attribution, never authorization.
+- Provider credential/licensure status is informational only and never controls
+  signup, trial, billing, continued use, entitlement, capability, or real-PHI
+  access. Practices authorize workforce membership and roles; do not claim that
+  Cosmaneura verifies professional licensure or credentials.
 - `baa.html` and `baa.pdf` publish counsel-approved CN-BAA-CUST-CW v2.2. Never
   edit canonical agreement bytes in place. A substantive change requires a new
   version, counsel approval, and updated pinned hashes.
