@@ -21,6 +21,13 @@ page is intentionally unchanged pending an approved wrapper/accessibility
 strategy. Channel is attribution, not authorization. Join still requires a
 matching practice work-email domain.
 
+The paid-pilot offer is $89 per active clinician per month for practices with
+at most 20 active clinician seats. A card is collected during onboarding and
+the 14-day trial begins at Checkout, before credential approval. Real-PHI
+capabilities remain locked while that approval is pending. The five product
+capabilities and their public rollout labels have one build-time source in
+`content/product-capabilities.mjs`; that source file is never published.
+
 ## Deploy
 
 Cloudflare Pages is connected to this repo. A merge to `main` does not publish:
@@ -69,18 +76,21 @@ the canonical HTML.
 ```bash
 node --test tests/site-readiness.test.mjs
 node --check channel-links.js
+node --check content/product-capabilities.mjs
 node --check scripts/build-site.mjs
+node --check scripts/preview-server.mjs
 node --check scripts/smoke-live.mjs
 node scripts/build-site.mjs
 git diff --check
-npx serve dist
+node scripts/preview-server.mjs
 ```
 
 The readiness tests resolve every internal link, enforce channel attribution,
 pin the complete canonical BAA HTML and PDF, check semantic landmarks and
-keyboard focus, and validate the Pages headers/redirect posture. `npx serve`
-is only for visual review after building `dist`; it does not emulate
-Cloudflare's pretty-path or 404 rules exactly.
+keyboard focus, and validate the Pages headers/redirect posture. The local
+preview server serves only `dist`, supports the site's pretty paths, and sends
+the checked-in 404 document with an actual HTTP 404 for unknown, source, and
+retired `/api/*` paths.
 
 The same deterministic checks run on pull requests and pushes to `main`. The
 temporary GitHub-hosted uptime probe runs every six hours to conserve the
@@ -125,11 +135,12 @@ it to prevent a merge.
 7. Operator cleanup remains outside this repo: delete the retired Stripe
    webhook endpoint only after confirming no traffic still depends on it.
 
-Rollback is artifact-first: reactivate the last known-good `891ac80`
-deployment in Cloudflare. That does not rebuild it. Before retrying or rebuilding
-an older commit that lacks `scripts/build-site.mjs`, restore the former empty
-build command and root output; otherwise that rebuild will fail while the last
-successful deployment remains live.
+Rollback is artifact-first: immediately before promotion, record the active
+Cloudflare production deployment ID and reactivate that exact immutable
+artifact if rollback is needed. Do not rebuild an older commit as a rollback.
+The current legacy artifact exposes repository files, so returning to it is an
+emergency availability move with a known residual exposure, not a clean end
+state. See `docs/PRODUCTION_PROMOTION.md` for the exact sequence.
 
 Steps 4 and 5 have a deterministic read-only probe:
 

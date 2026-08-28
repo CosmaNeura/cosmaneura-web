@@ -23,10 +23,11 @@ that work; it does not replace decomposition or deployed-state reconciliation.
 - GitHub Actions also runs readiness checks and live-domain uptime probes.
 - Install: N/A; this repository has no package manifest or dependency install.
 - Full/focused test: `node --test tests/site-readiness.test.mjs`.
-- Syntax and build: `node --check channel-links.js && node --check scripts/build-site.mjs && node --check scripts/smoke-live.mjs && node scripts/build-site.mjs`.
+- Syntax and build: `node --check channel-links.js && node --check content/product-capabilities.mjs && node --check scripts/build-site.mjs && node --check scripts/preview-server.mjs && node --check scripts/smoke-live.mjs && node scripts/build-site.mjs`.
 - Lint/typecheck: N/A; no linter or type checker is configured.
-- Local preview: build with `node scripts/build-site.mjs`; `npx serve dist` is
-  documented for an interactive preview but is not a pinned repository tool.
+- Local preview: build with `node scripts/build-site.mjs`, then run
+  `node scripts/preview-server.mjs`. The preview server models pretty HTML
+  paths and real 404 responses without adding a dependency.
 - Migration: N/A; this repository owns no database or stored application data.
 
 ## Risk classes (declare one on every PR)
@@ -134,6 +135,9 @@ be released independently.
 - Preserve the static-site boundary and the public-asset allowlist in
   `scripts/build-site.mjs`. Keep `404.html` and the retired `/api/*` paths at
   HTTP 404. Do not add a 200 SPA fallback.
+- Keep the five-tool availability catalog in
+  `content/product-capabilities.mjs`; the build renders it into `index.html`
+  without publishing the source module or adding runtime behavior.
 - Preserve channel attribution without treating it as authorization.
 - `baa.html` and `baa.pdf` remain byte-pinned counsel-approved CN-BAA-CUST-CW
   v2.2; a substantive change needs a new version, counsel approval, and hashes.

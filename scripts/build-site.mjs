@@ -1,6 +1,11 @@
-import { copyFile, lstat, mkdir, rm } from "node:fs/promises";
+import { copyFile, lstat, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import {
+  capabilityStatuses,
+  productCapabilities,
+} from "../content/product-capabilities.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const output = resolve(root, "dist");
@@ -41,6 +46,45 @@ const publicAssets = [
   "terms.html",
 ];
 
+const capabilityCatalogMarker = "<!-- PRODUCT_CAPABILITY_CATALOG -->";
+
+function escapeHtml(value) {
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character],
+  );
+}
+
+function renderCapabilityCatalog() {
+  return productCapabilities
+    .map((capability) => {
+      const statusLabel = capabilityStatuses[capability.status];
+      if (!statusLabel) {
+        throw new Error(
+          `Unknown availability status for ${capability.key}: ${capability.status}`,
+        );
+      }
+
+      return [
+        `        <article class="tool-card" data-capability="${escapeHtml(capability.key)}" data-availability="${escapeHtml(capability.status)}">`,
+        "          <div class=\"tool-card-heading\">",
+        `            <h3>${escapeHtml(capability.name)}</h3>`,
+        `            <span class="availability availability-${escapeHtml(capability.status)}">${escapeHtml(statusLabel)}</span>`,
+        "          </div>",
+        `          <p>${escapeHtml(capability.description)}</p>`,
+        "        </article>",
+      ].join("\n");
+    })
+    .join("\n");
+}
+
 await rm(output, { force: true, recursive: true });
 await mkdir(output, { recursive: true });
 
@@ -50,6 +94,23 @@ for (const asset of publicAssets) {
   if (!sourceStat.isFile() || sourceStat.isSymbolicLink()) {
     throw new Error(`Refusing non-regular public asset: ${asset}`);
   }
+
+  if (asset === "index.html") {
+    const template = await readFile(source, "utf8");
+    const markerCount = template.split(capabilityCatalogMarker).length - 1;
+    if (markerCount !== 1) {
+      throw new Error(
+        `Expected one product capability marker in index.html; found ${markerCount}`,
+      );
+    }
+    const rendered = template.replace(
+      capabilityCatalogMarker,
+      renderCapabilityCatalog(),
+    );
+    await writeFile(resolve(output, asset), rendered, "utf8");
+    continue;
+  }
+
   await copyFile(source, resolve(output, asset));
 }
 
