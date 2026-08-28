@@ -33,8 +33,8 @@ not identity, security, or credential proof. This static site owns no signup
 form or NPI collection. Any future NPI request belongs in the application and
 must be just-in-time for an enabled payer-facing transaction or integration
 that actually requires it. CAB is billing intelligence and advisory only;
-claim submission, 837P generation, and clearinghouse enrollment are not on the
-roadmap.
+claim submission, 837P generation, clearinghouse enrollment, and EHR writeback
+are not on the roadmap.
 
 Known promotion blocker: the byte-pinned, counsel-approved BAA v2.2 currently
 includes “claims preparation and submission support” in Exhibit A. This change

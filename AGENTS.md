@@ -142,8 +142,8 @@ be released independently.
   one as identity, security, or credential proof. Any future NPI collection is
   app-owned and just-in-time for an enabled payer-facing transaction or
   integration that actually requires it. CAB remains billing intelligence and
-  advisory only; claim submission, 837P generation, and clearinghouse
-  enrollment are not on the roadmap.
+  advisory only; claim submission, 837P generation, clearinghouse enrollment,
+  and EHR writeback are not on the roadmap.
 - Preserve channel attribution without treating it as authorization.
 - `baa.html` and `baa.pdf` remain byte-pinned counsel-approved CN-BAA-CUST-CW
   v2.2; a substantive change needs a new version, counsel approval, and hashes.

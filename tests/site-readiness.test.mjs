@@ -781,7 +781,11 @@ test("initial signup and onboarding do not collect or rely on NPI", () => {
   assert.match(internalGuidance, /NPI is\s+not identity, security, or credential proof/i);
   assert.match(
     internalGuidance,
-    /enabled payer-facing transaction or integration that actually requires it/i,
+    /enabled payer-facing transaction or integration\s+that actually requires it/i,
+  );
+  assert.match(
+    internalGuidance,
+    /claim submission, 837P generation, clearinghouse enrollment, and EHR writeback\s+are not on the roadmap/i,
   );
 });
 

@@ -37,9 +37,10 @@ pass for every item below:
 - Confirm initial signup and onboarding do not request or require an NPI and do
   not present NPI as identity, security, or credential proof. Confirm CAB is
   billing intelligence and advisory only and that claim submission, 837P
-  generation, and clearinghouse enrollment are not described as current or
-  roadmap capabilities. Any future NPI collection must be just-in-time for an
-  enabled payer-facing transaction or integration that actually requires it.
+  generation, clearinghouse enrollment, and EHR writeback are not described as
+  current or roadmap capabilities. Any future NPI collection must be
+  just-in-time for an enabled payer-facing transaction or integration that
+  actually requires it.
 - Resolve the counsel-approved BAA v2.2 Exhibit A phrase “claims preparation
   and submission support.” The BAA HTML and PDF are byte-pinned and must not be
   edited in place. Do not promote until counsel either approves a new version
