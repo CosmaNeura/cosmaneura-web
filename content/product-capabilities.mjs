@@ -38,6 +38,6 @@ export const productCapabilities = Object.freeze([
     name: "Computer-Assisted Billing",
     status: "coming_soon",
     description:
-      "Advisory recommendations will require clinician or coder verification. No EHR write or claim submission.",
+      "Billing intelligence only. CAB provides advisory recommendations for clinician or coder review. It will not write to the EHR, submit claims, generate 837P files, or enroll practices with a clearinghouse; those capabilities are not on the roadmap.",
   }),
 ]);

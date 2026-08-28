@@ -34,10 +34,26 @@ pass for every item below:
 - Complete one final copy check against the approved price, seat limit, trial
   timing, card collection, credential gate, capability availability, and legal
   links. Record the reviewer and exact `main` SHA.
-- Exercise the direct, Catholic, and MCD CTAs end to end with synthetic data.
-  Confirm channel attribution, the production app destination, authentication,
-  onboarding, test-mode Checkout, credential-pending behavior, entitlements,
-  first SOAP value, and Billing Portal. Do not use PHI or create a live charge.
+- Confirm initial signup and onboarding do not request or require an NPI and do
+  not present NPI as identity, security, or credential proof. Confirm CAB is
+  billing intelligence and advisory only and that claim submission, 837P
+  generation, clearinghouse enrollment, and EHR writeback are not described as
+  current or roadmap capabilities. Any future NPI collection must be
+  just-in-time for an enabled payer-facing transaction or integration that
+  actually requires it.
+- Resolve the counsel-approved BAA v2.2 Exhibit A phrase “claims preparation
+  and submission support.” The BAA HTML and PDF are byte-pinned and must not be
+  edited in place. Do not promote until counsel either approves a new version
+  with new hashes and a version-bound acceptance flow or provides a written
+  disposition reconciling the existing clause with the owner-approved product
+  policy.
+- Exercise the direct, Catholic, and MCD CTAs end to end with a signed-out,
+  synthetic test session. Confirm channel attribution, the production app
+  destination, authentication, onboarding, test-mode Checkout,
+  credential-pending behavior, entitlements, first SOAP value, and Billing
+  Portal. Inspect every signup and onboarding field and record that no NPI
+  prompt or requirement appears and that NPI is not used to verify identity,
+  account security, or credentials. Do not use PHI or create a live charge.
 - Confirm both `CLOUDFLARE_ACCOUNT_ID` and the least-privilege
   `CLOUDFLARE_API_TOKEN` exist in the GitHub `production` environment without
   exposing their values.

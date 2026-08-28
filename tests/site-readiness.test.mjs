@@ -630,6 +630,10 @@ test("production promotion is manual, founder-only, reviewed, and commit-bound",
   assert.match(promotion, /Agent review is evidence, not a\s+GitHub approval/);
   assert.match(promotion, /environment is an audit boundary, not a claim/);
   assert.match(promotion, /deployment\s+branches to `main`/);
+  assert.match(promotion, /Do not promote until counsel either approves a new version/);
+  assert.match(promotion, /new hashes and a version-bound acceptance flow/);
+  assert.match(promotion, /reconciling the existing\s+clause with the owner-approved product\s+policy/);
+  assert.match(read("baa.html"), /claims preparation and submission support/i);
 });
 
 test("Cloudflare Pages configuration adds safe headers without rewrites", () => {
@@ -688,9 +692,10 @@ test("public copy no longer calls the counsel-approved BAA a draft", () => {
 });
 
 test("public copy does not promise unverified or inactive features", () => {
-  const publicCopy = ["index.html", "catholic.html", "mcd.html", "company.html"]
-    .map(read)
-    .join("\n");
+  const publicCopy = [
+    ...["index.html", "catholic.html", "mcd.html", "company.html"].map(read),
+    ...productCapabilities.map(({ description }) => description),
+  ].join("\n");
 
   assert.doesNotMatch(publicCopy, /2\.4 hrs/i);
   assert.doesNotMatch(publicCopy, /English, Spanish & Mandarin/i);
@@ -702,6 +707,22 @@ test("public copy does not promise unverified or inactive features", () => {
   assert.doesNotMatch(publicCopy, /NFP and fertility/i);
   assert.doesNotMatch(publicCopy, /\$99/i);
   assert.doesNotMatch(publicCopy, /captures? the visit/i);
+  assert.doesNotMatch(
+    publicCopy,
+    /\b(?:(?:can|will|may)\s+(?:submit|file|transmit)|(?:Cosmas|CAB|we)\s+(?:submits?|files?|transmits?))\s+(?:insurance\s+)?claims?\b/i,
+  );
+  assert.doesNotMatch(
+    publicCopy,
+    /\b(?:claim submission|837P generation|clearinghouse enrollment)\b.{0,40}\b(?:available|included|supported|coming soon|planned)\b/i,
+  );
+  assert.doesNotMatch(
+    publicCopy,
+    /\b(?:(?:can|will|may)\s+(?:generate|create)|(?:Cosmas|CAB|we)\s+(?:generates?|creates?))\s+837P\b/i,
+  );
+  assert.doesNotMatch(
+    publicCopy,
+    /\b(?:(?:can|will|may)\s+enroll|(?:Cosmas|CAB|we)\s+enrolls?)\b.{0,60}\bclearinghouse\b/i,
+  );
   assert.match(read("mcd.html"), /Limited Cosmas rollout for MyCatholicDoctor work-email users/);
 });
 
@@ -726,6 +747,45 @@ test("paid-pilot offer copy matches the confirmed billing and credential contrac
   assert.match(
     success,
     /Real-PHI capabilities remain locked while credential approval is pending/i,
+  );
+});
+
+test("initial signup and onboarding do not collect or rely on NPI", () => {
+  const entryPages = ["index.html", "catholic.html", "mcd.html", "success.html"];
+
+  for (const page of entryPages) {
+    const html = read(page);
+    assert.match(html, /No NPI is requested or required during signup or onboarding/i, page);
+    assert.equal((html.match(/\bNPI\b/g) ?? []).length, 1, `${page}: keep NPI copy concise`);
+    assert.doesNotMatch(html, /payer-facing|identity, account security|credential proof/i, page);
+  }
+
+  const publicHtml = htmlPages.map(read).join("\n");
+  assert.doesNotMatch(
+    publicHtml,
+    /<(?:input|select|textarea)\b[^>]*(?:\bnpi\b|national provider identifier)/i,
+  );
+  assert.doesNotMatch(
+    publicHtml,
+    /<form\b[\s\S]*?(?:\bnpi\b|national provider identifier)[\s\S]*?<\/form>/i,
+  );
+  assert.doesNotMatch(
+    publicHtml,
+    /\b(?:NPI|National Provider Identifier)\s+(?:is|serves as|acts as)\s+(?:an?\s+)?(?:identity|security|credential)\s+(?:check|proof|verification)/i,
+  );
+
+  const internalGuidance = ["AGENTS.md", "README.md", "docs/PRODUCTION_PROMOTION.md"]
+    .map(read)
+    .join("\n");
+  assert.match(internalGuidance, /NPI collection is\s+app-owned and just-in-time/i);
+  assert.match(internalGuidance, /NPI is\s+not identity, security, or credential proof/i);
+  assert.match(
+    internalGuidance,
+    /enabled payer-facing transaction or integration\s+that actually requires it/i,
+  );
+  assert.match(
+    internalGuidance,
+    /claim submission, 837P generation, clearinghouse enrollment, and EHR writeback\s+are not on the roadmap/i,
   );
 });
 
@@ -759,8 +819,13 @@ test("one content source truthfully labels all five provider capabilities", () =
   assert.match(session.description, /provider-only, read-only/i);
   assert.match(scribe.description, /web and PWA capture comes first/i);
   assert.match(scribe.description, /Desktop and native-mobile clients remain on the roadmap/i);
-  assert.match(cab.description, /Advisory recommendations/i);
-  assert.match(cab.description, /No EHR write or claim submission/i);
+  assert.match(cab.description, /Billing intelligence only/i);
+  assert.match(cab.description, /advisory recommendations for clinician or coder review/i);
+  assert.match(
+    cab.description,
+    /will not write to the EHR, submit claims, generate 837P files, or enroll practices with a clearinghouse/i,
+  );
+  assert.match(cab.description, /those capabilities are not on the roadmap/i);
 
   const output = join(root, "dist");
   try {
@@ -776,6 +841,7 @@ test("one content source truthfully labels all five provider capabilities", () =
       );
       assert.ok(builtHome.includes(capability.name), capability.name);
       assert.ok(builtHome.includes(capabilityStatuses[capability.status]), capability.key);
+      assert.ok(builtHome.includes(capability.description), capability.description);
     }
   } finally {
     rmSync(output, { force: true, recursive: true });

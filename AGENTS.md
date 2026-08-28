@@ -138,9 +138,19 @@ be released independently.
 - Keep the five-tool availability catalog in
   `content/product-capabilities.mjs`; the build renders it into `index.html`
   without publishing the source module or adding runtime behavior.
+- Initial signup and onboarding must not request or require an NPI or present
+  one as identity, security, or credential proof. Any future NPI collection is
+  app-owned and just-in-time for an enabled payer-facing transaction or
+  integration that actually requires it. CAB remains billing intelligence and
+  advisory only; claim submission, 837P generation, clearinghouse enrollment,
+  and EHR writeback are not on the roadmap.
 - Preserve channel attribution without treating it as authorization.
 - `baa.html` and `baa.pdf` remain byte-pinned counsel-approved CN-BAA-CUST-CW
   v2.2; a substantive change needs a new version, counsel approval, and hashes.
+  Do not reinterpret its Exhibit A “claims preparation and submission support”
+  phrase as a CAB product commitment. Production remains blocked until counsel
+  provides written reconciliation with advisory-only CAB or approves a newly
+  versioned BAA and version-bound acceptance flow.
 - Do not add analytics without approved privacy scope, disclosures, and CSP.
 - Keep each PR to one deployable outcome, reviewable in roughly ten minutes.
   Cross-repo changes are receiver-first and backward compatible.
