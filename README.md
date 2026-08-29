@@ -11,7 +11,7 @@ Same product, three doors — not cloned apps:
 | `/catholic` | Catholic practices |
 | `/mcd` | Limited MyCatholicDoctor rollout (`@mycatholicdoctor.com`) |
 | `/company` | Cosmaneura Inc |
-| `/baa` | Counsel-approved CN-BAA-CUST-CW v2.2 |
+| `/baa` | Counsel-approved CN-BAA-CUST-CW v2.3 |
 
 Sign-in and sign-up go to production Cosmas with one of the app's three
 accepted channels: `direct`, `catholic`, or `mcd`. Every CTA on an editable
@@ -44,10 +44,9 @@ credential field is unverified informational metadata only and has no access,
 security, billing, or entitlement effect.
 
 Counsel-approved BAA v2.3 removes the claim-submission phrase from Exhibit A
-while preserving the remaining billing and revenue-cycle language. Its
-immutable versioned HTML/PDF assets are staged separately from the canonical
-v2.2 aliases so Core can activate version-bound v2.3 acceptance without ever
-linking an acceptance to the wrong PDF. Follow
+while preserving the remaining billing and revenue-cycle language. The
+canonical aliases now serve v2.3, and immutable v2.2/v2.3 assets preserve the
+exact agreements associated with acceptance records. Follow
 `docs/flight-plans/baa-v2-3-claims-scope.md` for the required receiver-first
 rollout and hold points.
 
@@ -87,10 +86,11 @@ application endpoint is ready, remove the retired Stripe webhook endpoint that
 pointed at `cosmaneura.com/api/webhook`.
 MCD has no public subscribe.
 
-`baa.html` and `baa.pdf` publish the counsel-approved CN-BAA-CUST-CW v2.2
-artifact. The canonical agreement text and PDF bytes must not be edited in
-place; a text change requires a new version, counsel approval, and new pinned
-hashes. The `/baa` response carries `Cache-Control: no-transform` so
+`baa.html` and `baa.pdf` publish the counsel-approved CN-BAA-CUST-CW v2.3
+artifact. Versioned v2.2 and v2.3 HTML/PDF assets preserve immutable agreement
+copies. Canonical agreement bytes must not be edited in place; a text change
+requires a new version, counsel approval, and new pinned hashes. The `/baa`
+response carries `Cache-Control: no-transform` so
 Cloudflare does not rewrite the notice email or inject its email decoder into
 the canonical HTML.
 

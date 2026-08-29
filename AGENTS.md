@@ -151,11 +151,10 @@ be released independently.
   rollout controls. Public copy must not imply Cosmaneura verifies licensure.
 - Preserve channel attribution without treating it as authorization.
 - `baa.html` and `baa.pdf` remain byte-pinned counsel-approved CN-BAA-CUST-CW
-  v2.2; a substantive change needs a new version, counsel approval, and hashes.
-  Do not reinterpret its Exhibit A “claims preparation and submission support”
-  phrase as a CAB product commitment. Production remains blocked until counsel
-  provides written reconciliation with advisory-only CAB or approves a newly
-  versioned BAA and version-bound acceptance flow.
+  v2.3; immutable versioned assets preserve v2.2 and v2.3. A substantive change
+  needs a new version, counsel approval, new hashes, and version-bound
+  re-acceptance. v2.3 removes the former claim-submission language from Exhibit
+  A and does not expand CAB beyond billing intelligence and advisory support.
 - Do not add analytics without approved privacy scope, disclosures, and CSP.
 - Keep each PR to one deployable outcome, reviewable in roughly ten minutes.
   Cross-repo changes are receiver-first and backward compatible.

@@ -5,8 +5,12 @@ const baseUrl = new URL(process.env.SITE_URL ?? "https://cosmaneura.com");
 assert.equal(baseUrl.protocol, "https:", "SITE_URL must use HTTPS");
 
 const expectedBaaHashes = new Map([
-  ["/baa", "7f99117742c5f68b854d91fd09131c70f5c80c6e915350ffada34de98a4485d0"],
-  ["/baa.pdf", "43fe893059cf4fbd3db364e30632b35aa5716dc1a5a6759299f5cf039aceabcc"],
+  ["/baa", "cc83a9b6eb6ff49bd6e700a40009a8ce70ce996f71d795bcaaa0a610e9dd3371"],
+  ["/baa.pdf", "94da2fc53777922e23ed542a034a12ffce65e10f1436754b7421c8d35544eacc"],
+  ["/baa-v2-2", "e312e78c880650bc7dc5df7f0208a427dce37879a17e3b05f311e8b4f5888be7"],
+  ["/baa-v2-2.pdf", "43fe893059cf4fbd3db364e30632b35aa5716dc1a5a6759299f5cf039aceabcc"],
+  ["/baa-v2-3", "afca61339b3c944b4fedf309ee73f5ee5fda3cd9a9d8aaa53a886f712ed05c12"],
+  ["/baa-v2-3.pdf", "94da2fc53777922e23ed542a034a12ffce65e10f1436754b7421c8d35544eacc"],
 ]);
 
 async function request(path) {
@@ -94,7 +98,7 @@ assert.doesNotMatch(success, /you(?:'|’)?re subscribed/i);
 
 for (const [path, expectedHash] of expectedBaaHashes) {
   const response = await expectStatus(path, 200);
-  if (path === "/baa") {
+  if (!path.endsWith(".pdf")) {
     assert.match(response.headers.get("cache-control") ?? "", /\bno-transform\b/);
   }
   const hash = createHash("sha256")

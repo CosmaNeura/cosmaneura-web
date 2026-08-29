@@ -345,7 +345,7 @@ test("canonical metadata, sitemap, and robots cover the indexable pages", () => 
     ["https://cosmaneura.com/catholic", "2026-08-27"],
     ["https://cosmaneura.com/mcd", "2026-08-27"],
     ["https://cosmaneura.com/company", "2026-08-27"],
-    ["https://cosmaneura.com/baa", "2026-08-20"],
+    ["https://cosmaneura.com/baa", "2026-08-29"],
     ["https://cosmaneura.com/privacy", "2026-08-21"],
     ["https://cosmaneura.com/terms", "2026-08-21"],
   ]));
@@ -651,7 +651,8 @@ test("production promotion is manual, founder-only, reviewed, and commit-bound",
   assert.match(promotion, /publish and hash-verify the immutable versioned web assets before Core/);
   assert.match(promotion, /then move the canonical `\/baa` and `\/baa\.pdf`/);
   assert.match(promotion, /Do not skip or reorder those\s+hold points/);
-  assert.match(read("baa.html"), /claims preparation and submission support/i);
+  assert.match(read("baa.html"), /data-version="2\.3"/);
+  assert.doesNotMatch(read("baa.html"), /claims preparation and submission support/i);
   assert.doesNotMatch(read("baa-v2-3.html"), /claims preparation and submission support/i);
 });
 
@@ -677,6 +678,15 @@ test("Cloudflare Pages configuration adds safe headers without rewrites", () => 
     headers,
     /\/baa\n\s+Cache-Control: public, max-age=0, must-revalidate, no-transform/,
   );
+  for (const path of ["baa-v2-2", "baa-v2-2.pdf", "baa-v2-3", "baa-v2-3.pdf"]) {
+    assert.match(
+      headers,
+      new RegExp(
+        `/${path.replace(".", "\\.")}\\n\\s+Cache-Control: public, max-age=31536000, immutable, no-transform`,
+      ),
+      path,
+    );
+  }
   assert.match(headers, /X-Content-Type-Options: nosniff/);
   assert.match(headers, /X-Frame-Options: DENY/);
   assert.doesNotMatch(redirectRules, /\s200(?:\s|$)/m);
@@ -686,7 +696,7 @@ test("Cloudflare Pages configuration adds safe headers without rewrites", () => 
 test("README identifies the canonical BAA without calling it a draft", () => {
   const readme = read("README.md");
 
-  assert.match(readme, /Counsel-approved CN-BAA-CUST-CW v2\.2/);
+  assert.match(readme, /Counsel-approved CN-BAA-CUST-CW v2\.3/);
   assert.doesNotMatch(readme, /Draft BAA \(UX; counsel must ratify\)/);
   assert.match(readme, /must not be edited in\s+place/);
 });
@@ -974,15 +984,15 @@ test("canonical BAA HTML, article, and PDF bytes remain pinned", () => {
   assert.ok(article, "canonical BAA article is present");
   assert.equal(
     sha256(readBytes("baa.html")),
-    "7f99117742c5f68b854d91fd09131c70f5c80c6e915350ffada34de98a4485d0",
+    "cc83a9b6eb6ff49bd6e700a40009a8ce70ce996f71d795bcaaa0a610e9dd3371",
   );
   assert.equal(
     sha256(article[0]),
-    "182c9946296fc78e5eb9b094d7183eeafb48a24962e153d83a7be7afeaf3216b",
+    "efbb1266cdc54836f158c48c6926c11a10076cd06c9fa8308c0533c86f30ff18",
   );
   assert.equal(
     sha256(readBytes("baa.pdf")),
-    "43fe893059cf4fbd3db364e30632b35aa5716dc1a5a6759299f5cf039aceabcc",
+    "94da2fc53777922e23ed542a034a12ffce65e10f1436754b7421c8d35544eacc",
   );
 });
 
