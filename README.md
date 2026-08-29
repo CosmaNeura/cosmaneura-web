@@ -43,12 +43,13 @@ credentials merely because a practice authorized that user. Any legacy
 credential field is unverified informational metadata only and has no access,
 security, billing, or entitlement effect.
 
-Known promotion blocker: the byte-pinned, counsel-approved BAA v2.2 currently
-includes “claims preparation and submission support” in Exhibit A. This change
-does not alter or reinterpret that legal agreement. Before promotion, counsel
-must either approve a new version, hashes, and version-bound acceptance flow or
-provide a written disposition that reconciles the existing clause with the
-owner-approved product policy.
+Counsel-approved BAA v2.3 removes the claim-submission phrase from Exhibit A
+while preserving the remaining billing and revenue-cycle language. Its
+immutable versioned HTML/PDF assets are staged separately from the canonical
+v2.2 aliases so Core can activate version-bound v2.3 acceptance without ever
+linking an acceptance to the wrong PDF. Follow
+`docs/flight-plans/baa-v2-3-claims-scope.md` for the required receiver-first
+rollout and hold points.
 
 ## Deploy
 
