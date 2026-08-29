@@ -33,9 +33,11 @@ storage here.
   signup, trial, billing, continued use, entitlement, capability, or real-PHI
   access. Practices authorize workforce membership and roles; do not claim that
   Cosmaneura verifies professional licensure or credentials.
-- `baa.html` and `baa.pdf` publish counsel-approved CN-BAA-CUST-CW v2.2. Never
-  edit canonical agreement bytes in place. A substantive change requires a new
-  version, counsel approval, and updated pinned hashes.
+- `baa.html` and `baa.pdf` publish counsel-approved CN-BAA-CUST-CW v2.3, with
+  immutable versioned assets retaining v2.2 and v2.3.
+  Never edit canonical agreement bytes in place. A substantive change requires
+  a new version, counsel approval, updated pinned hashes, and version-bound
+  re-acceptance.
 - Do not add analytics code in this repository. Cloudflare Web Analytics
   Automatic Setup is account-owned and must remain consistent with the site's
   no-analytics-cookie disclosure. PostHog or any broader measurement requires
