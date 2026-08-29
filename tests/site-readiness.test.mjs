@@ -726,14 +726,22 @@ test("public copy does not promise unverified or inactive features", () => {
   assert.match(read("mcd.html"), /Limited Cosmas rollout for MyCatholicDoctor work-email users/);
 });
 
-test("paid-pilot offer copy matches the confirmed billing and workforce-authority contract", () => {
+test("public list-price copy denies checkout, trial, and card collection", () => {
   for (const page of ["index.html", "catholic.html"]) {
     const html = read(page);
-    assert.match(html, /\$89/, page);
-    assert.match(html, /per active clinician \/ month/, page);
-    assert.match(html, /20 active clinician seats per practice/i, page);
-    assert.match(html, /14-day trial begins at Checkout/i, page);
-    assert.match(html, /card is collected during onboarding/i, page);
+    const pricing = html.match(/<section class="block" id="pricing">[\s\S]*?<\/section>/);
+    assert.ok(pricing, `${page}: missing pricing section`);
+    assert.match(pricing[0], /\$89/, page);
+    assert.match(pricing[0], /per active clinician \/ month/, page);
+    assert.match(pricing[0], /20 active clinician seats per practice/i, page);
+    assert.match(
+      pricing[0],
+      /<strong>List price only:<\/strong> \$89 per active clinician per month is the public list price/i,
+      page,
+    );
+    assert.doesNotMatch(html.replace(pricing[0], ""), /\$89/, page);
+    assert.match(html, /No 14-day trial begins at checkout/i, page);
+    assert.match(html, /no card is collected during onboarding/i, page);
     assert.match(
       html,
       /practice controls workforce membership/i,
@@ -743,14 +751,35 @@ test("paid-pilot offer copy matches the confirmed billing and workforce-authorit
   }
 
   const success = read("success.html");
-  assert.match(success, /14-day trial begins at Checkout/i);
-  assert.match(success, /card is collected during onboarding/i);
+  assert.match(success, /No 14-day trial begins at checkout/i);
+  assert.match(success, /no card is collected during onboarding/i);
   assert.match(success, /practice controls workforce membership/i);
   assert.match(success, /not credential or licensure review/i);
 
-  const publicCopy = ["index.html", "catholic.html", "mcd.html", "success.html"]
+  const publicCopy = htmlPages
     .map(read)
     .join("\n");
+  assert.doesNotMatch(publicCopy, /\$60\b/);
+  for (const page of htmlPages) {
+    const html = read(page);
+    assert.doesNotMatch(html, /href="[^"]*checkout/i, page);
+    assert.doesNotMatch(html, /<form\b[^>]*action="[^"]*checkout/i, page);
+    assert.doesNotMatch(
+      html,
+      /<input\b[^>]*(?:value|aria-label)="[^"]*(?:checkout|buy now|subscribe|start (?:a )?(?:free|trial))/i,
+      page,
+    );
+    for (const [, , attributes, body] of html.matchAll(
+      /<(a|button)\b([^>]*)>([\s\S]*?)<\/\1>/gi,
+    )) {
+      const text = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+      assert.doesNotMatch(
+        `${attributes}\n${text}`,
+        /\b(?:checkout|buy now|subscribe|start (?:a )?(?:free|trial))\b/i,
+        page,
+      );
+    }
+  }
   assert.doesNotMatch(
     publicCopy,
     /before credential approval|credential[- ]pending|locked until credential|credential approval is pending/i,
@@ -796,7 +825,7 @@ test("initial signup and onboarding do not collect or rely on NPI", () => {
   );
 });
 
-test("one content source truthfully labels all five provider capabilities", () => {
+test("the internal capability catalog distinguishes the live workflow from unoffered work", () => {
   assert.deepEqual(
     productCapabilities.map(({ key }) => key),
     ["soap_note", "intake_prep", "session_prep", "scribe", "cab"],
@@ -804,52 +833,90 @@ test("one content source truthfully labels all five provider capabilities", () =
   assert.deepEqual(
     productCapabilities.map(({ status }) => status),
     [
-      "paid_pilot_preview",
-      "paid_pilot_preview",
-      "coming_soon",
-      "coming_soon",
-      "coming_soon",
+      "available",
+      "not_offered",
+      "not_offered",
+      "not_offered",
+      "not_offered",
     ],
   );
-  assert.deepEqual(Object.keys(capabilityStatuses), [
-    "available",
-    "paid_pilot_preview",
-    "coming_soon",
-  ]);
-
-  const intake = productCapabilities.find(({ key }) => key === "intake_prep");
-  const session = productCapabilities.find(({ key }) => key === "session_prep");
-  const scribe = productCapabilities.find(({ key }) => key === "scribe");
-  const cab = productCapabilities.find(({ key }) => key === "cab");
-  assert.match(intake.description, /patient-authored, five-question Visit Prep/i);
-  assert.match(intake.description, /configure the wording and order/i);
-  assert.match(session.description, /provider-only, read-only/i);
-  assert.match(scribe.description, /web and PWA capture comes first/i);
-  assert.match(scribe.description, /Desktop and native-mobile clients remain on the roadmap/i);
-  assert.match(cab.description, /Billing intelligence only/i);
-  assert.match(cab.description, /advisory recommendations for clinician or coder review/i);
-  assert.match(
-    cab.description,
-    /will not write to the EHR, submit claims, generate 837P files, or enroll practices with a clearinghouse/i,
+  assert.deepEqual(Object.keys(capabilityStatuses), ["available", "not_offered"]);
+  assert.equal(
+    new Set(productCapabilities.map(({ key }) => key)).size,
+    productCapabilities.length,
   );
-  assert.match(cab.description, /those capabilities are not on the roadmap/i);
+  for (const capability of productCapabilities) {
+    assert.ok(capabilityStatuses[capability.status], capability.key);
+  }
+
+  const soapNote = productCapabilities.find(({ key }) => key === "soap_note");
+  const intake = productCapabilities.find(({ key }) => key === "intake_prep");
+  const available = productCapabilities.filter(({ status }) => status === "available");
+  const notOffered = productCapabilities.filter(({ status }) => status === "not_offered");
+  assert.deepEqual(available.map(({ key }) => key), ["soap_note"]);
+  assert.match(soapNote.description, /Upload a visit recording/i);
+  assert.match(soapNote.description, /review and edit the draft SOAP note/i);
+  assert.match(soapNote.description, /copy and paste/i);
+  assert.equal(intake.status, "not_offered");
+
+  const forbiddenUnpublishedClaims =
+    /ambient|two[- ]week|14[- ]day|trial|card|checkout|voice learning|in[- ]person|zoom(?:[- ]bot)?|SOC\s*2|EHR\s+write[- ]?back|\$\d+/i;
+  for (const capability of notOffered) {
+    const catalogEntry = [
+      capability.name,
+      capabilityStatuses[capability.status],
+      capability.description,
+    ].join("\n");
+    assert.match(capability.description, /Not offered as a public Cosmas product/i);
+    assert.doesNotMatch(catalogEntry, forbiddenUnpublishedClaims, capability.key);
+  }
+
+  assert.doesNotMatch(
+    [
+      ...Object.entries(capabilityStatuses).flat(),
+      ...productCapabilities.flatMap((capability) => Object.values(capability)),
+    ].join("\n"),
+    /paid[- ]pilot|coming soon/i,
+  );
 
   const output = join(root, "dist");
   try {
     buildSite();
     const builtHome = readFileSync(join(output, "index.html"), "utf8");
+    const sourceHome = read("index.html");
+    const catalog = builtHome.match(
+      /<template id="unpublished-capability-catalog">([\s\S]*?)<\/template>/,
+    );
+    assert.ok(catalog, "built homepage retains the inert catalog boundary");
     assert.doesNotMatch(builtHome, /PRODUCT_CAPABILITY_CATALOG/);
-    for (const capability of productCapabilities) {
-      assert.equal(
-        (builtHome.match(new RegExp(`data-capability="${capability.key}"`, "g")) ?? [])
-          .length,
-        1,
+    assert.equal((catalog[1].match(/data-capability="soap_note"/g) ?? []).length, 1);
+    assert.ok(catalog[1].includes(soapNote.name));
+    assert.ok(catalog[1].includes(capabilityStatuses[soapNote.status]));
+    assert.ok(catalog[1].includes(soapNote.description));
+    assert.doesNotMatch(
+      catalog[1].replace(/<[^>]+>/g, " "),
+      forbiddenUnpublishedClaims,
+    );
+    for (const capability of notOffered) {
+      assert.doesNotMatch(
+        catalog[1],
+        new RegExp(`data-capability="${capability.key}"`),
         capability.key,
       );
-      assert.ok(builtHome.includes(capability.name), capability.name);
-      assert.ok(builtHome.includes(capabilityStatuses[capability.status]), capability.key);
-      assert.ok(builtHome.includes(capability.description), capability.description);
+      assert.equal(catalog[1].includes(capability.name), false, capability.name);
     }
+
+    const [sourceBeforeCatalog, sourceAfterCatalog] = sourceHome.split(
+      "<!-- PRODUCT_CAPABILITY_CATALOG -->",
+    );
+    assert.ok(builtHome.startsWith(sourceBeforeCatalog));
+    assert.ok(builtHome.endsWith(sourceAfterCatalog));
+    assert.match(
+      builtHome,
+      /<strong>List price only:<\/strong> \$89 per active clinician per month is the public list price/i,
+    );
+    assert.doesNotMatch(builtHome, /\$60\b/);
+    assert.doesNotMatch(builtHome, /href="[^"]*checkout/i);
   } finally {
     rmSync(output, { force: true, recursive: true });
   }
