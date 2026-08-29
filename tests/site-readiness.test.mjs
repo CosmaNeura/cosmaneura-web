@@ -26,12 +26,17 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const htmlPages = readdirSync(root)
   .filter((path) => path.endsWith(".html"))
   .sort();
+const baaHtmlPages = new Set(["baa.html", "baa-v2-2.html", "baa-v2-3.html"]);
 
 const publicFiles = new Map([
   ["/", "index.html"],
   ["/404", "404.html"],
   ["/baa", "baa.html"],
   ["/baa.pdf", "baa.pdf"],
+  ["/baa-v2-2", "baa-v2-2.html"],
+  ["/baa-v2-2.pdf", "baa-v2-2.pdf"],
+  ["/baa-v2-3", "baa-v2-3.html"],
+  ["/baa-v2-3.pdf", "baa-v2-3.pdf"],
   ["/catholic", "catholic.html"],
   ["/company", "company.html"],
   ["/mcd", "mcd.html"],
@@ -213,7 +218,7 @@ test("three-door app links preserve the source channel", () => {
 });
 
 test("public pages expose one main landmark and visible keyboard focus", () => {
-  for (const page of htmlPages.filter((path) => path !== "baa.html")) {
+  for (const page of htmlPages.filter((path) => !baaHtmlPages.has(path))) {
     const html = read(page);
     assert.equal((html.match(/<main\b/g) ?? []).length, 1, page);
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1, page);
@@ -234,7 +239,7 @@ test("public pages expose one main landmark and visible keyboard focus", () => {
 });
 
 test("every editable-page link has an accessible name", () => {
-  for (const page of htmlPages.filter((path) => path !== "baa.html")) {
+  for (const page of htmlPages.filter((path) => !baaHtmlPages.has(path))) {
     const html = read(page);
     const anchors = [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)];
     assert.ok(anchors.length > 0, page);
@@ -350,6 +355,15 @@ test("canonical metadata, sitemap, and robots cover the indexable pages", () => 
   assert.match(robots, /^Sitemap: https:\/\/cosmaneura\.com\/sitemap\.xml$/m);
   assert.match(read("success.html"), /<meta name="robots" content="noindex">/);
   assert.doesNotMatch(read("success.html"), /rel="canonical"/);
+  for (const [page, canonical] of [
+    ["baa-v2-2.html", "https://cosmaneura.com/baa-v2-2"],
+    ["baa-v2-3.html", "https://cosmaneura.com/baa-v2-3"],
+  ]) {
+    const html = read(page);
+    assert.match(html, /<meta name="robots" content="noindex">/, page);
+    assert.ok(html.includes(`<link rel="canonical" href="${canonical}">`), page);
+    assert.ok(html.includes(`<meta property="og:url" content="${canonical}">`), page);
+  }
 });
 
 test("the marketing site stays static and functions-free", () => {
@@ -390,6 +404,10 @@ test("the public build contains only the reviewed asset allowlist", () => {
       "_headers",
       "_redirects",
       "apple-touch-icon.png",
+      "baa-v2-2.html",
+      "baa-v2-2.pdf",
+      "baa-v2-3.html",
+      "baa-v2-3.pdf",
       "baa.html",
       "baa.pdf",
       "catholic.html",
@@ -630,10 +648,11 @@ test("production promotion is manual, founder-only, reviewed, and commit-bound",
   assert.match(promotion, /Agent review is evidence, not a\s+GitHub approval/);
   assert.match(promotion, /environment is an audit boundary, not a claim/);
   assert.match(promotion, /deployment\s+branches to `main`/);
-  assert.match(promotion, /Do not promote until counsel either approves a new version/);
-  assert.match(promotion, /new hashes and a version-bound acceptance flow/);
-  assert.match(promotion, /reconciling the existing\s+clause with the owner-approved product\s+policy/);
+  assert.match(promotion, /publish and hash-verify the immutable versioned web assets before Core/);
+  assert.match(promotion, /then move the canonical `\/baa` and `\/baa\.pdf`/);
+  assert.match(promotion, /Do not skip or reorder those\s+hold points/);
   assert.match(read("baa.html"), /claims preparation and submission support/i);
+  assert.doesNotMatch(read("baa-v2-3.html"), /claims preparation and submission support/i);
 });
 
 test("Cloudflare Pages configuration adds safe headers without rewrites", () => {
@@ -965,4 +984,41 @@ test("canonical BAA HTML, article, and PDF bytes remain pinned", () => {
     sha256(readBytes("baa.pdf")),
     "43fe893059cf4fbd3db364e30632b35aa5716dc1a5a6759299f5cf039aceabcc",
   );
+});
+
+test("versioned BAA assets are pinned and v2.3 has the approved scope", () => {
+  const baaV22 = read("baa-v2-2.html");
+  const baaV23 = read("baa-v2-3.html");
+  const baaV23Article = baaV23.match(
+    /<article class="cn-baa"[^>]*>[\s\S]*?<\/article>/,
+  );
+
+  assert.equal(
+    sha256(readBytes("baa-v2-2.html")),
+    "e312e78c880650bc7dc5df7f0208a427dce37879a17e3b05f311e8b4f5888be7",
+  );
+  assert.equal(
+    sha256(readBytes("baa-v2-2.pdf")),
+    "43fe893059cf4fbd3db364e30632b35aa5716dc1a5a6759299f5cf039aceabcc",
+  );
+  assert.equal(
+    sha256(readBytes("baa-v2-3.html")),
+    "afca61339b3c944b4fedf309ee73f5ee5fda3cd9a9d8aaa53a886f712ed05c12",
+  );
+  assert.ok(baaV23Article, "canonical v2.3 BAA article is present");
+  assert.equal(
+    sha256(baaV23Article[0]),
+    "efbb1266cdc54836f158c48c6926c11a10076cd06c9fa8308c0533c86f30ff18",
+  );
+  assert.equal(
+    sha256(readBytes("baa-v2-3.pdf")),
+    "94da2fc53777922e23ed542a034a12ffce65e10f1436754b7421c8d35544eacc",
+  );
+  assert.match(baaV22, /claims preparation and submission support/i);
+  assert.match(baaV23, /data-version="2\.3"/);
+  assert.match(
+    baaV23,
+    /Billing and revenue-cycle support, including charge capture and remittance and payment-posting support;/,
+  );
+  assert.doesNotMatch(baaV23, /claims preparation and submission support/i);
 });

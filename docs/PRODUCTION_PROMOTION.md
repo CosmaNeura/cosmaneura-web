@@ -45,12 +45,11 @@ pass for every item below:
   does not claim Cosmaneura verifies licensure or credentials, and does not make
   credential/licensure status a condition of signup, trial, billing, continued
   use, entitlement, capability, or real-PHI access.
-- Resolve the counsel-approved BAA v2.2 Exhibit A phrase “claims preparation
-  and submission support.” The BAA HTML and PDF are byte-pinned and must not be
-  edited in place. Do not promote until counsel either approves a new version
-  with new hashes and a version-bound acceptance flow or provides a written
-  disposition reconciling the existing clause with the owner-approved product
-  policy.
+- For BAA v2.3, follow `docs/flight-plans/baa-v2-3-claims-scope.md` exactly:
+  publish and hash-verify the immutable versioned web assets before Core
+  activates v2.3 acceptance, then move the canonical `/baa` and `/baa.pdf`
+  aliases only after Core serves and records v2.3. Do not skip or reorder those
+  hold points.
 - Exercise the direct, Catholic, and MCD CTAs end to end with a signed-out,
   synthetic test session. Confirm channel attribution, the production app
   destination, authentication, onboarding, test-mode Checkout,
