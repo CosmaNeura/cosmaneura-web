@@ -46,7 +46,7 @@ const publicAssets = [
   "terms.html",
 ];
 
-const capabilityCatalogMarker = "<!-- PRODUCT_CAPABILITY_CATALOG -->";
+const unpublishedCatalogMarker = "<!-- PRODUCT_CAPABILITY_CATALOG -->";
 
 function escapeHtml(value) {
   return value.replace(
@@ -62,15 +62,19 @@ function escapeHtml(value) {
   );
 }
 
-function renderCapabilityCatalog() {
+function renderAvailableCapabilityCatalog() {
+  for (const capability of productCapabilities) {
+    if (!capabilityStatuses[capability.status]) {
+      throw new Error(
+        `Unknown availability status for ${capability.key}: ${capability.status}`,
+      );
+    }
+  }
+
   return productCapabilities
+    .filter(({ status }) => status === "available")
     .map((capability) => {
       const statusLabel = capabilityStatuses[capability.status];
-      if (!statusLabel) {
-        throw new Error(
-          `Unknown availability status for ${capability.key}: ${capability.status}`,
-        );
-      }
 
       return [
         `        <article class="tool-card" data-capability="${escapeHtml(capability.key)}" data-availability="${escapeHtml(capability.status)}">`,
@@ -97,15 +101,15 @@ for (const asset of publicAssets) {
 
   if (asset === "index.html") {
     const template = await readFile(source, "utf8");
-    const markerCount = template.split(capabilityCatalogMarker).length - 1;
+    const markerCount = template.split(unpublishedCatalogMarker).length - 1;
     if (markerCount !== 1) {
       throw new Error(
-        `Expected one product capability marker in index.html; found ${markerCount}`,
+        `Expected one unpublished capability marker in index.html; found ${markerCount}`,
       );
     }
     const rendered = template.replace(
-      capabilityCatalogMarker,
-      renderCapabilityCatalog(),
+      unpublishedCatalogMarker,
+      renderAvailableCapabilityCatalog(),
     );
     await writeFile(resolve(output, asset), rendered, "utf8");
     continue;
