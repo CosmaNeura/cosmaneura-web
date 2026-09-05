@@ -169,3 +169,12 @@ be released independently.
 - Every PR records its tier, tests, exact recovery move, independent agent
   review evidence, and only the conditional controls that actually apply.
 - Documentation-only changes must not build or deploy production artifacts.
+- Marketing agent work lives only in this repository. Follow
+  `docs/MARKETING_AGENT_SOP.md`, keep shared truth in
+  `.agents/product-marketing.md`, and port the Grok Bot CMO from
+  `docs/grok-bot-cmo/`. Install Cursor marketing skills with
+  `./scripts/install-marketing-skills.sh` (`.agents/skills/` is local/gitignored).
+  Creative marketing PRs stay separate from Tier 2 legal/header/redirect work.
+  Never put PHI in marketing prompts, drafts, fixtures, or Grok Bot memory.
+  Upstream skill marketplace partner tools are optional ads and remain off by
+  default. Do not edit `settings-grok` or `visit-prep-grok` for CMO work.
