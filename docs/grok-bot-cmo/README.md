@@ -25,9 +25,10 @@ Sources: [Introducing Grok Bot](https://x.ai/news/introducing-grok-bot) (2026-08
 1. Create a Bot named **Cosmas CMO** (or similar).
 2. Paste `BOT_PROFILE.md` into the Bot description / standing instructions.
 3. Paste `product-marketing.md` into Bot knowledge/files (or pin as the first
-   always-read document). **Do not port until founder resolves OPEN CONFLICTS.**
+   always-read document). This file is ACTIVE (v1); escalate only open **W#**
+   wording items if they come up.
 4. Create Skills from each file in `skills/` (one skill per file). Prefer pasting
-   the Cosmaneura-constrained briefs here over raw upstream marketingskills text.
+   these Cosmaneura-constrained briefs over raw upstream marketingskills text.
 5. Set Approvals: require human approval for send/publish/spend/delete/production
    changes. Never auto-publish site or ads.
 6. Do **not** connect PHI-bearing production systems, EHR, claim rails, or
