@@ -14,13 +14,19 @@ test("marketing agent SOP and product context exist with required guardrails", (
   assert.match(sop, /Stacked PR methodology/);
   assert.match(sop, /Creative vs Tier 2/);
   assert.match(sop, /Grok Bot CMO/);
+  assert.match(sop, /three messaging layers|Cosmas OS \*\*waitlist\*\*/);
 
   const context = read(".agents/product-marketing.md");
-  assert.match(context, /OPEN CONFLICTS/);
-  assert.match(context, /### C1 —/);
-  assert.match(context, /Settled for now/);
-  assert.match(context, /Never put real PHI/);
-  assert.match(context, /optional ads, off by default/);
+  assert.match(context, /\*\*Document version:\*\* v1/);
+  assert.match(context, /Decision log/);
+  assert.match(context, /Messaging architecture/);
+  assert.match(context, /Cosmas OS/);
+  assert.match(context, /Coming soon/);
+  assert.match(context, /Session Prep/);
+  assert.match(context, /Card Chase/);
+  assert.match(context, /BAA available/);
+  assert.match(context, /No real PHI/);
+  assert.match(context, /off by default/);
 
   assert.equal(existsSync(join(root, "scripts/install-marketing-skills.sh")), true);
   assert.equal(existsSync(join(root, "docs/grok-bot-cmo/README.md")), true);

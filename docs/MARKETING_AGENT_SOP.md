@@ -26,10 +26,14 @@ Pinned intent is recorded in `skills-lock.json` after install.
 
 ## Before any marketing task
 
-1. Read `.agents/product-marketing.md`.
-2. If any **OPEN CONFLICT** remains unresolved, stop and ask the founder.
-3. Prefer settled live-site facts over architecture aspirations.
-4. Never invent trial, SOC 2, claim submission, EHR write-back, or NPI-at-signup.
+1. Read `.agents/product-marketing.md` (v1+ is ACTIVE).
+2. Obey the three messaging layers: SOAP **now**; named suite **coming soon**;
+   Cosmas OS **waitlist** only. Do not sell roadmap or OS as generally available.
+3. Prefer live commercial facts (price/trial/card) until the founder ships the
+   post-Auth billing change to site + this doc together.
+4. Never invent trial, SOC 2, claim submission, EHR write-back, NPI-at-signup,
+   faith-forward door copy, or named competitors.
+5. Escalate only remaining **W#** wording items from product-marketing.md.
 
 ## Partner ads — off by design
 
