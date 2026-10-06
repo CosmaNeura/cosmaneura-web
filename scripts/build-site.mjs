@@ -38,6 +38,7 @@ const publicAssets = [
   "catholic.html",
   "channel-links.js",
   "company.html",
+  "cosmabot.html",
   "favicon.svg",
   "index.html",
   "mcd.html",
