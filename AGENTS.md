@@ -138,6 +138,11 @@ be released independently.
 - Keep the five-tool availability catalog in
   `content/product-capabilities.mjs`; the build renders it into `index.html`
   without publishing the source module or adding runtime behavior.
+- `cosmabot.html` is an additive static introduction to the planned Provider
+  Team. Its product home and marketing-only waitlist live separately on
+  `cosmas.ai` in `CosmaNeura/cosmabot-web`. Keep all signup APIs, mail services,
+  secrets, and marketing contact storage outside this company repository.
+  Follow `docs/flight-plans/cosmabot-waitlist.md` before promoting the link.
 - Initial signup and onboarding must not request or require an NPI or present
   one as identity, security, or credential proof. Any future NPI collection is
   app-owned and just-in-time for an enabled payer-facing transaction or
