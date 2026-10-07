@@ -143,6 +143,11 @@ be released independently.
   `cosmas.ai` in `CosmaNeura/cosmabot-web`. Keep all signup APIs, mail services,
   secrets, and marketing contact storage outside this company repository.
   Follow `docs/flight-plans/cosmabot-waitlist.md` before promoting the link.
+- The coming-soon page and homepage feature prioritize the existing practice
+  account route. Keep its direct/Catholic/MCD channel behavior and distinguish
+  current Cosmas access from planned CosmaBot roles. `cosmabot.css`,
+  `cosmabot.js` and the six `bot-*.png` portraits are allowlisted static assets;
+  all role descriptions must remain present and readable without JavaScript.
 - Initial signup and onboarding must not request or require an NPI or present
   one as identity, security, or credential proof. Any future NPI collection is
   app-owned and just-in-time for an enabled payer-facing transaction or
