@@ -2,6 +2,14 @@
 
 ## Outcome and boundaries
 
+October 7 implementation: use the owner-selected platform-first presentation
+at `/cosmabot`, promote it from the existing homepage, and prioritize creating
+practice accounts through the current Cosmas entry. Optional CosmaBot launch
+emails remain a separate signup on cosmas.ai; an account grants neither bot
+access nor email consent. Preserve the current direct/Catholic/MCD channels.
+Reuse the approved six bot portraits, including orange-and-black Billing.
+No new analytics or application changes are included.
+
 Provide a distinct company introduction at `cosmaneura.com/cosmabot`, pointing
 to the primary product home and waitlist at `cosmas.ai`. The owner selected
 healthcare practices first, cosmas.ai for search authority, and Resend for mail.
@@ -40,6 +48,20 @@ Before company promotion, identify and record the active Pages deployment ID
 and artifact, preserve deployed copy or obtain an explicit replacement decision.
 The previous exact production artifact remains the rollback target; it is not
 yet available through the current connection.
+
+October 7 recheck: remote main is `6ca166dd427bcab8c353d823e5fea14047b2344b`
+after PR #22. The earlier trial/card homepage mismatch is no longer present
+in the fetched main homepage and observed public copy. `/cosmabot` still
+returns the public 404, so the company introduction remains unpublished.
+The active immutable Pages artifact and cumulative release comparison still
+must be recorded before production; this PR does not authorize promotion.
+
+The cosmas.ai controlled email test passed and signup has been closed again.
+Both Google and Cloudflare resolve the apex and www on October 7; apex HTTPS
+returns 200 and www redirects 301 to the apex. Do not change functioning DNS
+based on a sandbox resolver failure. Public signup/indexing remain separate
+release decisions. A company product introduction may publish while the
+waitlist is closed if it describes availability accurately.
 
 ## Release control
 

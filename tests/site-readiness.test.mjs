@@ -40,6 +40,15 @@ const publicFiles = new Map([
   ["/catholic", "catholic.html"],
   ["/company", "company.html"],
   ["/cosmabot", "cosmabot.html"],
+  ["/cosmabot.css", "cosmabot.css"],
+  ["/cosmabot.js", "cosmabot.js"],
+  ["/bot-visit-prep.png", "bot-visit-prep.png"],
+  ["/bot-scribe.png", "bot-scribe.png"],
+  ["/bot-follow-up.png", "bot-follow-up.png"],
+  ["/bot-chief.png", "bot-chief.png"],
+  ["/bot-research.png", "bot-research.png"],
+  ["/bot-billing.png", "bot-billing.png"],
+
   ["/mcd", "mcd.html"],
   ["/privacy", "privacy.html"],
   ["/success", "success.html"],
@@ -187,6 +196,7 @@ test("three-door app links preserve the source channel", () => {
     ["catholic.html", "catholic"],
     ["mcd.html", "mcd"],
     ["company.html", "direct"],
+    ["cosmabot.html", "direct"],
     ["privacy.html", "direct"],
     ["terms.html", "direct"],
     ["success.html", "direct"],
@@ -218,6 +228,28 @@ test("three-door app links preserve the source channel", () => {
   assert.doesNotMatch(channelScript, /location\.search\s*\+/);
 });
 
+test("CosmaBot account discovery preserves planned-role and email-consent boundaries", () => {
+  const intro = read("cosmabot.html");
+  const roles = [...intro.matchAll(/<article class="provider-role"[^>]+>([\s\S]*?)<\/article>/g)];
+  assert.equal(roles.length, 6);
+  for (const [, role] of roles) {
+    assert.match(role, /<h3>[^<]+<\/h3>/);
+    assert.match(role, /<p>[^<]+<\/p>/);
+    assert.doesNotMatch(role, /\bhidden\b/);
+  }
+  assert.match(intro, /Creating a practice account does not unlock the planned team/);
+  assert.match(intro, /Creating an account here does not subscribe you to launch emails/);
+  assert.doesNotMatch(intro, /<form\b|\/api\/|CosmasOS/);
+  const graph = JSON.parse(intro.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1])["@graph"];
+  assert.equal(graph.find(item => item["@type"] === "Brand")["@id"], "https://cosmas.ai/#brand");
+  assert.equal(graph.find(item => item["@type"] === "Organization")["@id"], "https://cosmaneura.com/#organization");
+  const home = read("index.html");
+  assert.match(home, /id="cosmabot-heading"/);
+  assert.match(home, /href="\/cosmabot"/);
+  const script = read("cosmabot.js");
+  assert.doesNotMatch(script, /fetch\(|XMLHttpRequest|localStorage|document\.cookie|location\./);
+});
+
 test("public pages expose one main landmark and visible keyboard focus", () => {
   for (const page of htmlPages.filter((path) => !baaHtmlPages.has(path))) {
     const html = read(page);
@@ -227,7 +259,7 @@ test("public pages expose one main landmark and visible keyboard focus", () => {
     if (html.includes("<nav")) {
       assert.match(html, /<nav aria-label="Primary">/, page);
       assert.match(html, /<a class="skip-link" href="#main-content">/, page);
-      assert.match(html, /<body>\s*<a class="skip-link" href="#main-content">/, page);
+      assert.match(html, /<body(?: class="[^"]+")?>\s*<a class="skip-link" href="#main-content">/, page);
     }
     if (html.includes("<footer")) {
       assert.match(html, /<nav class="foot-links" aria-label="Footer">/, page);
@@ -255,13 +287,14 @@ test("every editable-page link has an accessible name", () => {
 
 test("the home-page keyboard order starts with skip, navigation, and primary CTA", () => {
   const home = read("index.html");
-  const body = home.slice(home.indexOf("<body>"));
-  assert.deepEqual(hrefs(body).slice(0, 6), [
+  const body = home.slice(home.search(/<body\b/));
+  assert.deepEqual(hrefs(body).slice(0, 7), [
     "#main-content",
     "/",
     "#tools",
     "#pricing",
     "/catholic",
+    "/cosmabot",
     "https://app.cosmaneura.com/sign-up?channel=direct",
   ]);
 });
@@ -343,11 +376,11 @@ test("canonical metadata, sitemap, and robots cover the indexable pages", () => 
       .map(([, location, lastModified]) => [location, lastModified]),
   );
   assert.deepEqual(sitemapDates, new Map([
-    ["https://cosmaneura.com/", "2026-08-27"],
+    ["https://cosmaneura.com/", "2026-10-07"],
     ["https://cosmaneura.com/catholic", "2026-08-27"],
     ["https://cosmaneura.com/mcd", "2026-08-27"],
     ["https://cosmaneura.com/company", "2026-08-27"],
-    ["https://cosmaneura.com/cosmabot", "2026-10-06"],
+    ["https://cosmaneura.com/cosmabot", "2026-10-07"],
     ["https://cosmaneura.com/baa", "2026-08-29"],
     ["https://cosmaneura.com/privacy", "2026-08-21"],
     ["https://cosmaneura.com/terms", "2026-08-21"],
@@ -413,10 +446,18 @@ test("the public build contains only the reviewed asset allowlist", () => {
       "baa-v2-3.pdf",
       "baa.html",
       "baa.pdf",
+      "bot-billing.png",
+      "bot-chief.png",
+      "bot-follow-up.png",
+      "bot-research.png",
+      "bot-scribe.png",
+      "bot-visit-prep.png",
       "catholic.html",
       "channel-links.js",
       "company.html",
+      "cosmabot.css",
       "cosmabot.html",
+      "cosmabot.js",
       "favicon.svg",
       "index.html",
       "mcd.html",
