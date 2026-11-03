@@ -5,3 +5,7 @@ node_modules/
 dist/
 .env
 .env.*
+
+# Upstream marketing skills are installed locally (change-budget); keep
+# Cosmaneura product context and SOPs tracked.
+.agents/skills/
