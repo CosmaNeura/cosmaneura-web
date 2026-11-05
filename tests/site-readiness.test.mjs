@@ -237,8 +237,10 @@ test("CosmaBot account discovery preserves planned-role and email-consent bounda
     assert.match(role, /<p>[^<]+<\/p>/);
     assert.doesNotMatch(role, /\bhidden\b/);
   }
-  assert.match(intro, /Creating a practice account does not unlock the planned team/);
-  assert.match(intro, /Creating an account here does not subscribe you to launch emails/);
+  assert.match(intro, /Creating a Cosmas practice account does not unlock CosmaBot/);
+  assert.match(intro, /CosmaBot signup starts on/);
+  assert.match(intro, /https:\/\/cosmas\.ai\/\?source=cosmaneura/);
+  assert.doesNotMatch(intro, /Account signup starts with Cosmas/);
   assert.doesNotMatch(intro, /<form\b|\/api\/|CosmasOS/);
   const graph = JSON.parse(intro.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)[1])["@graph"];
   assert.equal(graph.find(item => item["@type"] === "Brand")["@id"], "https://cosmas.ai/#brand");
